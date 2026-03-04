@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TAG ATTACK - PRO EDITION</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;900&display=swap');
+        body { font-family: 'Outfit', sans-serif; touch-action: none; overflow: hidden; background: #7dd3fc; user-select: none; margin: 0; padding: 0; }
+        canvas { display: block; width: 100vw; height: 100vh; background: #7dd3fc; }
+        .gumball-panel { background: #ffffff; border: 6px solid #0f172a; box-shadow: 10px 10px 0px #0f172a; border-radius: 35px; }
+        .status-pill {
+            background: white; border: 4px solid #0f172a; padding: 8px 20px;
+            border-radius: 15px; font-weight: 900; font-size: 18px;
+            box-shadow: 4px 4px 0px #0f172a; color: #0f172a;
+        }
+        .joystick-base { width: 120px; height: 120px; background: rgba(15, 23, 42, 0.1); border: 5px solid #0f172a; border-radius: 50%; position: fixed; bottom: 40px; left: 40px; display: flex; align-items: center; justify-content: center; z-index: 50; }
+        .joystick-knob { width: 50px; height: 50px; background: #fbbf24; border: 5px solid #0f172a; border-radius: 50%; pointer-events: none; }
+        .btn-dash { position: fixed; bottom: 40px; right: 40px; width: 110px; height: 110px; background: #ef4444; border: 6px solid #0f172a; box-shadow: 8px 8px 0px #0f172a; border-radius: 30px; color: white; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 50; transition: 0.1s; font-size: 20px; }
+        .skin-opt { width: 45px; height: 45px; border: 4px solid #0f172a; border-radius: 12px; cursor: pointer; transition: 0.2s; }
+        .skin-opt.active { transform: scale(1.2); border-color: #fbbf24; }
+        #toast { position: fixed; top: 10%; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; font-weight: 900; color: #0f172a; font-size: 20px; display: none; text-align: center; background: white; padding: 12px 24px; border: 4px solid #0f172a; border-radius: 20px; box-shadow: 6px 6px 0px #0f172a; }
+        #chat-toggle { position: fixed; top: 120px; right: 20px; z-index: 100; cursor: pointer; pointer-events: auto; }
+        #chat-box { position: fixed; bottom: 160px; right: 20px; width: 250px; height: 300px; background: white; border: 4px solid #0f172a; border-radius: 20px; display: none; flex-direction: column; z-index: 100; overflow: hidden; box-shadow: 6px 6px 0px #0f172a; }
+        #chat-messages { flex-grow: 1; overflow-y: auto; padding: 10px; font-size: 14px; font-weight: bold; }
+        #chat-input { border: none; border-top: 4px solid #0f172a; padding: 10px; outline: none; font-weight: 900; width: 100%; }
+    </style>
+</head>
+<body>
+    <div id="toast"></div>
+    <div id="chat-toggle" class="status-pill" onclick="toggleChat()">💬 CHAT</div>
+    <div id="chat-box">
+        <div id="chat-messages"></div>
+        <input type="text" id="chat-input" placeholder="MESSAGE..." onkeydown="if(event.key==='Enter') sendChat()">
+    </div>
+
+    <div id="victory-screen" class="fixed inset-0 bg-slate-900/90 z-[2000] hidden flex-col items-center justify-center">
+        <div class="gumball-panel p-10 text-center">
+            <h2 class="text-4xl font-black mb-4 italic">ROUND OVER!</h2>
+            <p id="loser-text" class="text-2xl font-bold text-red-500 mb-8 uppercase"></p>
+            <button onclick="location.reload()" class="bg-yellow-400 border-4 border-slate-800 px-8 py-4 rounded-2xl font-black shadow-[4px_4px_0px_#0f172a]">MENU</button>
+        </div>
+    </div>
+
+    <div id="menu" class="fixed inset-0 z-[150] flex flex-col items-center justify-center p-4 bg-[#7dd3fc]">
+        <div class="gumball-panel p-8 w-full max-w-sm text-center">
+            <h1 class="text-5xl font-black italic text-slate-800 mb-1">TAG ATTACK</h1>
+            <p class="text-red-600 font-black mb-6 text-xs tracking-widest uppercase">BY DUMB BRAINEZ</p>
+            <input type="text" id="nameInput" placeholder="YOUR NAME" class="w-full bg-slate-50 border-4 border-slate-800 p-4 rounded-2xl text-center font-black text-xl mb-4 uppercase">
+            <div class="flex justify-center gap-3 mb-8">
+                <div class="skin-opt active" data-color="#22c55e" style="background: #22c55e;"></div>
+                <div class="skin-opt" data-color="#f97316" style="background: #f97316;"></div>
+                <div class="skin-opt" data-color="#a855f7" style="background: #a855f7;"></div>
+                <div class="skin-opt" data-color="#ec4899" style="background: #ec4899;"></div>
+            </div>
+            <div class="space-y-4">
+                <button onclick="openMapSelect()" class="w-full bg-yellow-400 border-4 border-slate-800 font-black py-4 rounded-2xl text-xl uppercase">HOST</button>
+                <div class="flex gap-2">
+                    <input type="text" id="roomInput" maxlength="4" placeholder="CODE" class="w-1/3 border-4 border-slate-800 rounded-2xl text-center font-black">
+                    <button onclick="setupRoom(false)" class="w-2/3 bg-emerald-400 border-4 border-slate-800 font-black py-4 rounded-2xl text-lg uppercase">JOIN</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="mapMenu" class="fixed inset-0 z-[160] flex flex-col items-center justify-center p-4 bg-[#7dd3fc] hidden">
+        <div class="gumball-panel p-8 w-full max-w-sm text-center">
+            <h2 class="text-3xl font-black mb-6">ARENA</h2>
+            <button onclick="startHost(0)" class="w-full bg-sky-300 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4">MAZE CITY</button>
+            <button onclick="startHost(1)" class="w-full bg-slate-800 text-cyan-400 border-4 border-cyan-400 py-4 rounded-2xl font-black">NEON VOID</button>
+        </div>
+    </div>
+
+    <div id="hud" class="fixed top-5 left-0 right-0 flex justify-center gap-4 z-50 pointer-events-none hidden">
+        <div id="timerBox" class="status-pill">03:00</div>
+        <div id="roomDisplay" class="status-pill border-blue-500 text-blue-500 pointer-events-auto" onclick="copyRoomCode()">ID: ----</div>
+    </div>
+
+    <canvas id="gameCanvas"></canvas>
+    <div id="controls" class="hidden">
+        <div class="joystick-base" id="joyBase"><div class="joystick-knob" id="joyKnob"></div></div>
+        <button class="btn-dash" id="dashBtn">DASH</button>
+    </div>
+
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const peerConfig = { config: { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] } };
+        let myId, peer, conn, isHost = false, players = {}, myName = "";
+        let joyPos = { x: 0, y: 0 }, isDashing = false;
+        let worldSize = 3000, cam = { x: 1500, y: 1500 };
+        let traps = [], obstacles = [], selectedMap = 0, currentRoomCode = "", gameActive = true;
+        let myColor = "#22c55e", matchTimer = 180;
+        const maps = [{ bg: "#7dd3fc", floor: "#4ade80", wall: "#0f172a", blockColor: "#ffb6c1" }, { bg: "#020617", floor: "#0f172a", wall: "#06b6d4", blockColor: "#1e293b" }];
+
+        document.querySelectorAll('.skin-opt').forEach(opt => {
+            opt.onclick = () => {
+                document.querySelectorAll('.skin-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                myColor = opt.dataset.color;
+            };
+        });
+
+        function toggleChat() {
+            const box = document.getElementById('chat-box');
+            box.style.display = box.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        function handleChat(data) {
+            const msgDiv = document.getElementById('chat-messages');
+            const entry = document.createElement('div');
+            entry.innerHTML = `<span style="color:#ef4444">${data.name}:</span> ${data.text}`;
+            msgDiv.appendChild(entry);
+            msgDiv.scrollTop = msgDiv.scrollHeight;
+        }
+
+        function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if(!msg) return;
+            const pkt = { type: 'chat', name: myName, text: msg };
+            if(isHost) { handleChat(pkt); broadcast(pkt); } else { conn.send(pkt); }
+            input.value = "";
+        }
+
+        function showToast(txt) {
+            const t = document.getElementById('toast'); t.innerText = txt; t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function openMapSelect() {
+            if(!document.getElementById('nameInput').value.trim()) return showToast("NAME NEEDED!");
+            document.getElementById('mapMenu').classList.remove('hidden');
+        }
+
+        function startHost(m) { selectedMap = m; setupRoom(true); }
+
+        function setupRoom(host) {
+            isHost = host;
+            myName = document.getElementById('nameInput').value.trim().toUpperCase() || "PLAYER";
+            const code = host ? Math.floor(1000 + Math.random()*9000).toString() : document.getElementById('roomInput').value;
+            if(!code) return showToast("ENTER CODE");
+            currentRoomCode = code;
+            peer = new Peer('tagattack-' + code, peerConfig);
+            peer.on('open', (id) => {
+                myId = id;
+                document.getElementById('menu').style.display = 'none';
+                document.getElementById('mapMenu').classList.add('hidden');
+                document.getElementById('hud').classList.remove('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+                document.getElementById('roomDisplay').innerText = "ID: " + code;
+                if(host) {
+                    obstacles = [];
+                    for(let i=0; i<18; i++) obstacles.push({ x: Math.random()*2500+250, y: Math.random()*2500+250, w: Math.random()>0.5?250:70, h: Math.random()>0.5?70:250 });
+                    players[myId] = { x: 500, y: 500, isIt: true, name: myName, color: myColor, protection: 0, frozen: 0 };
+                    for(let i=0; i<8; i++) traps.push({x: Math.random()*2600+200, y: Math.random()*2600+200});
+                } else {
+                    conn = peer.connect('tagattack-' + code);
+                    conn.on('open', () => conn.send({ type: 'join', name: myName, color: myColor }));
+                    conn.on('data', d => {
+                        if(d.type === 'state') { players = d.players; traps = d.traps; matchTimer = d.timer; selectedMap = d.map; obstacles = d.obstacles; }
+                        if(d.type === 'chat') handleChat(d);
+                        if(d.type === 'tag') showToast(d.msg);
+                        if(d.type === 'gameOver') { gameActive = false; document.getElementById('victory-screen').classList.remove('hidden'); document.getElementById('loser-text').innerText = d.loser + " LOST!"; }
+                    });
+                }
+                requestAnimationFrame(gameLoop);
+            });
+            if(host) {
+                peer.on('connection', (c) => {
+                    c.on('data', (d) => {
+                        if(d.type === 'join') players[c.peer] = { x: 2500, y: 2500, isIt: false, name: d.name, color: d.color, protection: 5, frozen: 0 };
+                        if(d.type === 'move' && players[c.peer]) { players[c.peer].x = d.x; players[c.peer].y = d.y; }
+                        if(d.type === 'chat') { handleChat(d); broadcast(d); }
+                    });
+                });
+            }
+        }
+
+        function gameLoop() {
+            if(!gameActive) return;
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const curMap = maps[selectedMap];
+            const me = players[myId];
+            if(me) {
+                if(me.frozen <= 0) {
+                    const speed = isDashing ? 28 : 12;
+                    me.x = Math.max(50, Math.min(worldSize-50, me.x + joyPos.x * speed));
+                    me.y = Math.max(50, Math.min(worldSize-50, me.y + joyPos.y * speed));
+                } else me.frozen -= 0.016;
+                cam.x += (me.x - cam.x) * 0.1; cam.y += (me.y - cam.y) * 0.1;
+                if(isHost) {
+                    matchTimer -= 0.016;
+                    if(matchTimer <= 0) { let l = Object.values(players).find(p=>p.isIt)?.name; broadcast({type:'gameOver', loser:l}); gameActive=false; }
+                    let itId = Object.keys(players).find(k => players[k].isIt);
+                    for(let id in players) {
+                        let p = players[id]; if(p.protection > 0) p.protection -= 0.016;
+                        if(itId && id !== itId && p.protection <= 0 && players[itId].protection <= 0 && Math.hypot(p.x-players[itId].x, p.y-players[itId].y) < 85) {
+                            players[itId].isIt = false; players[itId].protection = 3; p.isIt = true; p.protection = 3;
+                            broadcast({type:'tag', msg: p.name + " IS IT!"});
+                        }
+                    }
+                    broadcast({type:'state', players, traps, timer: matchTimer, map: selectedMap, obstacles});
+                } else if(conn?.open) conn.send({ type: 'move', x: me.x, y: me.y });
+            }
+            ctx.fillStyle = curMap.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
+            ctx.save(); ctx.translate(canvas.width/2, canvas.height/2); ctx.scale(0.35, 0.35); ctx.translate(-cam.x, -cam.y);
+            ctx.fillStyle = curMap.floor; ctx.fillRect(0,0,worldSize,worldSize);
+            obstacles.forEach(ob => { ctx.fillStyle = curMap.wall; ctx.fillRect(ob.x, ob.y, ob.w, ob.h); });
+            for(let id in players) {
+                let p = players[id]; ctx.fillStyle = p.isIt ? '#ef4444' : p.color;
+                ctx.fillRect(p.x-50, p.y-50, 100, 100);
+            }
+            ctx.restore();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function broadcast(data) { Object.values(peer.connections).forEach(conns => conns.forEach(c => c.send(data))); }
+
+        const base = document.getElementById('joyBase'), knob = document.getElementById('joyKnob');
+        const handleJoy = (e) => {
+            const t = e.touches ? e.touches[0] : e, r = base.getBoundingClientRect();
+            let dx = t.clientX - (r.left + 60), dy = t.clientY - (r.top + 60), d = Math.hypot(dx,dy);
+            if(d > 60) { dx *= 60/d; dy *= 60/d; }
+            knob.style.transform = `translate(${dx}px, ${dy}px)`;
+            joyPos = { x: dx/60, y: dy/60 };
+        };
+        base.addEventListener('touchstart', (e) => { e.preventDefault(); handleJoy(e); });
+        base.addEventListener('touchmove', (e) => { e.preventDefault(); handleJoy(e); });
+        base.addEventListener('touchend', () => { knob.style.transform = 'none'; joyPos = {x:0,y:0}; });
+        document.getElementById('dashBtn').addEventListener('touchstart', (e) => { e.preventDefault(); isDashing = true; });
+        document.getElementById('dashBtn').addEventListener('touchend', () => isDashing = false);
+    </script>
+</body>
+</html>
+    
