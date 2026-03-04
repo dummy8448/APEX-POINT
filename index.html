@@ -3,71 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAG ATTACK PRO - DUMB BRAINEZ</title>
+    <title>TAG ATTACK v1.17</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;900&display=swap');
         body { font-family: 'Outfit', sans-serif; touch-action: none; overflow: hidden; background: #7dd3fc; user-select: none; margin: 0; padding: 0; }
-        canvas { display: block; width: 100vw; height: 100vh; }
+        canvas { display: block; width: 100vw; height: 100vh; background: #7dd3fc; }
+        
         .gumball-panel { background: #ffffff; border: 6px solid #0f172a; box-shadow: 10px 10px 0px #0f172a; border-radius: 35px; }
-        .status-pill { background: white; border: 4px solid #0f172a; padding: 8px 20px; border-radius: 15px; font-weight: 900; font-size: 18px; box-shadow: 4px 4px 0px #0f172a; color: #0f172a; }
-        #chat-ui { position: fixed; top: 100px; left: 20px; width: 260px; height: 180px; z-index: 100; pointer-events: none; display: flex; flex-direction: column; }
+        .status-pill {
+            background: white; border: 4px solid #0f172a; padding: 8px 20px;
+            border-radius: 15px; font-weight: 900; font-size: 18px;
+            box-shadow: 4px 4px 0px #0f172a; color: #0f172a;
+        }
+
+        #chat-ui { position: fixed; top: 100px; left: 20px; width: 280px; height: 220px; z-index: 100; pointer-events: none; display: flex; flex-direction: column; }
         #chat-box { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 5px; padding: 10px; pointer-events: none; }
-        .chat-bubble { background: rgba(15, 23, 42, 0.8); color: white; padding: 6px 12px; border-radius: 12px; font-size: 14px; font-weight: 700; width: fit-content; animation: fadeIn 0.3s ease; border: 2px solid rgba(255,255,255,0.2); }
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
-        #chat-input-container { pointer-events: auto; display: flex; gap: 5px; margin-top: 5px; }
-        #chat-input { flex: 1; background: white; border: 3px solid #0f172a; border-radius: 10px; padding: 5px 10px; font-weight: 900; outline: none; }
-        #chat-send { background: #fbbf24; border: 3px solid #0f172a; border-radius: 10px; padding: 5px 10px; font-weight: 900; cursor: pointer; }
-        .joystick-base { width: 120px; height: 120px; background: rgba(15, 23, 42, 0.1); border: 5px solid #0f172a; border-radius: 50%; position: fixed; bottom: 40px; left: 40px; display: flex; align-items: center; justify-content: center; z-index: 50; }
+        .chat-bubble { background: rgba(15, 23, 42, 0.9); color: white; padding: 8px 14px; border-radius: 15px; font-size: 13px; font-weight: 800; width: fit-content; animation: fadeIn 0.3s ease; border: 2px solid rgba(255,255,255,0.1); word-break: break-word; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        
+        #chat-input-container { pointer-events: auto; display: flex; gap: 5px; margin-top: 5px; background: white; padding: 5px; border: 4px solid #0f172a; border-radius: 15px; }
+        #chat-input { flex: 1; background: transparent; border: none; padding: 5px 10px; font-weight: 900; font-size: 14px; outline: none; color: #0f172a; }
+        #chat-send { background: #fbbf24; border: 3px solid #0f172a; border-radius: 10px; padding: 5px 15px; font-weight: 900; cursor: pointer; color: #0f172a; }
+
+        .joystick-base { 
+            width: 120px; height: 120px; background: rgba(15, 23, 42, 0.1); border: 5px solid #0f172a; border-radius: 50%; 
+            position: fixed; bottom: 40px; left: 40px; display: flex; align-items: center; justify-content: center; z-index: 50;
+        }
         .joystick-knob { width: 50px; height: 50px; background: #fbbf24; border: 5px solid #0f172a; border-radius: 50%; pointer-events: none; }
-        .btn-dash { position: fixed; bottom: 40px; right: 40px; width: 110px; height: 110px; background: #ef4444; border: 6px solid #0f172a; box-shadow: 8px 8px 0px #0f172a; border-radius: 30px; color: white; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 50; transition: all 0.1s; font-size: 20px; }
-        .emote-wheel { position: fixed; bottom: 40px; right: 170px; display: flex; gap: 10px; z-index: 50; }
-        .emote-btn { width: 50px; height: 50px; background: white; border: 3px solid #0f172a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 3px 3px 0px #0f172a; }
+        
+        .btn-dash { 
+            position: fixed; bottom: 40px; right: 40px; width: 110px; height: 110px; 
+            background: #ef4444; border: 6px solid #0f172a; box-shadow: 8px 8px 0px #0f172a; 
+            border-radius: 30px; color: white; font-weight: 900; display: flex; align-items: center; justify-content: center; z-index: 50;
+            transition: all 0.1s; font-size: 20px;
+        }
+        .btn-dash:active { transform: translate(4px, 4px); box-shadow: 4px 4px 0px #0f172a; }
+
         .skin-opt { width: 45px; height: 45px; border: 4px solid #0f172a; border-radius: 12px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
-        .skin-opt.active { transform: scale(1.2); border-color: #fbbf24; box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
-        #toast { position: fixed; top: 20%; left: 50%; transform: translateX(-50%); z-index: 1000; pointer-events: none; font-weight: 900; color: #ef4444; font-size: 28px; text-shadow: 2px 2px 0 #fff; display: none; text-align: center; background: white; padding: 10px 20px; border: 4px solid #0f172a; border-radius: 20px; }
-        #loading-overlay { position: fixed; inset: 0; background: rgba(125, 211, 252, 1); z-index: 500; display: none; flex-direction: column; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #0f172a; }
-        .hidden { display: none !important; }
+        .skin-opt.active { transform: scale(1.2); border-color: #fbbf24; z-index: 10; }
+
+        #loading-overlay { position: fixed; inset: 0; background: rgba(125, 211, 252, 0.9); z-index: 500; display: none; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #0f172a; }
     </style>
 </head>
 <body>
 
-    <div id="toast"></div>
-    <div id="loading-overlay">
-        <p id="load-msg">CONNECTING...</p>
-        <button id="cancel-load" class="mt-4 text-sm underline">Cancel</button>
-    </div>
-
-    <div id="victory-screen" class="fixed inset-0 bg-slate-900/90 z-[2000] hidden flex-col items-center justify-center">
-        <div class="gumball-panel p-10 text-center">
-            <h2 class="text-4xl font-black mb-4 italic">GAME OVER!</h2>
-            <p id="loser-text" class="text-2xl font-bold text-red-500 mb-8 uppercase"></p>
-            <button onclick="location.reload()" class="bg-yellow-400 border-4 border-slate-800 px-8 py-4 rounded-2xl font-black shadow-[4px_4px_0px_#0f172a]">MENU</button>
-        </div>
-    </div>
+    <div id="loading-overlay">CONNECTING...</div>
 
     <!-- MAIN MENU -->
     <div id="menu" class="fixed inset-0 z-[150] flex flex-col items-center justify-center p-4 bg-[#7dd3fc]">
         <div class="gumball-panel p-8 w-full max-w-sm text-center">
-            <h1 class="text-5xl font-black italic text-slate-800 uppercase leading-none mb-1">TAG ATTACK</h1>
-            <p class="text-red-600 font-black mb-6 text-sm italic tracking-widest uppercase">BY DUMB BRAINEZ</p>
-
+            <h1 class="text-5xl font-black italic text-slate-800 uppercase mb-1">TAG ATTACK</h1>
+            <p class="text-red-600 font-black mb-6 text-sm italic tracking-widest uppercase">VERSION 1.17</p>
             <input type="text" id="nameInput" placeholder="YOUR NAME" class="w-full bg-slate-50 border-4 border-slate-800 p-4 rounded-2xl text-center font-black text-xl outline-none uppercase shadow-[4px_4px_0px_#0f172a] mb-4">
             
-            <p class="text-xs font-black uppercase mb-2">Select Skin</p>
-            <div class="flex flex-wrap justify-center gap-3 mb-8" id="skin-container">
-                <div class="skin-opt active" data-color="#22c55e" style="background: #22c55e;"></div>
-                <div class="skin-opt" data-color="#f97316" style="background: #f97316;"></div>
-                <div class="skin-opt" data-color="#a855f7" style="background: #a855f7;"></div>
-                <div class="skin-opt" data-color="#ec4899" style="background: #ec4899;"></div>
-                <div class="skin-opt" data-color="gumball" style="background: #50bfe6; display: flex; align-items: center; justify-content: center; font-size: 24px;">🐱</div>
+            <p class="text-xs font-bold text-slate-500 mb-2 uppercase">Select Skin</p>
+            <div class="flex flex-wrap justify-center gap-2 mb-8">
+                <div class="skin-opt active" data-skin="green" style="background: #22c55e;"></div>
+                <div class="skin-opt" data-skin="black" style="background: #0f172a;"></div>
+                <div class="skin-opt" data-skin="gumball" title="Gumball" style="background: #7dd3fc; border-bottom: 8px solid #fde68a;"></div>
+                <div class="skin-opt" data-skin="darwin" title="Darwin" style="background: #f97316; border-bottom: 8px solid #4ade80;"></div>
+                <div class="skin-opt" data-skin="cook" title="Cook" style="background: #f8fafc; border-top: 8px solid #cbd5e1;"></div>
             </div>
 
             <div class="space-y-4">
-                <button id="btn-host-menu" class="w-full bg-yellow-400 border-4 border-slate-800 shadow-[6px_6px_0px_#0f172a] font-black py-4 rounded-2xl text-xl uppercase">HOST ROOM</button>
+                <button onclick="openMapSelect()" class="w-full bg-yellow-400 border-4 border-slate-800 shadow-[6px_6px_0px_#0f172a] font-black py-4 rounded-2xl text-xl uppercase active:translate-y-1">HOST ROOM</button>
                 <div class="flex gap-2">
                     <input type="text" id="roomInput" maxlength="4" placeholder="CODE" class="w-1/3 bg-white border-4 border-slate-800 rounded-2xl text-center font-black">
-                    <button id="btn-join-room" class="w-2/3 bg-emerald-400 border-4 border-slate-800 shadow-[4px_4px_0px_#0f172a] font-black py-4 rounded-2xl text-lg uppercase">JOIN</button>
+                    <button onclick="setupRoom(false)" class="w-2/3 bg-emerald-400 border-4 border-slate-800 shadow-[4px_4px_0px_#0f172a] font-black py-4 rounded-2xl text-lg uppercase active:translate-y-1">JOIN</button>
                 </div>
             </div>
         </div>
@@ -77,22 +80,21 @@
     <div id="mapMenu" class="fixed inset-0 z-[160] flex flex-col items-center justify-center p-4 bg-[#7dd3fc] hidden">
         <div class="gumball-panel p-8 w-full max-w-sm text-center">
             <h2 class="text-3xl font-black mb-6 italic uppercase">ARENA</h2>
-            <button onclick="startHost(0)" class="w-full bg-emerald-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4">MAP-ING</button>
-            <button onclick="startHost(1)" class="w-full bg-slate-800 text-cyan-400 border-4 border-cyan-400 py-4 rounded-2xl font-black mb-4">NEON VOID</button>
-            <button onclick="startHost(2)" class="w-full bg-orange-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-6">ELMORE HIGH</button>
-            <button onclick="document.getElementById('mapMenu').classList.add('hidden')" class="text-sm font-bold uppercase underline">Back</button>
+            <button onclick="startHost(2)" class="w-full bg-blue-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4 shadow-[4px_4px_0px_#0f172a] text-white italic">ELMORE SUBURBS</button>
+            <button onclick="startHost(0)" class="w-full bg-emerald-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4 shadow-[4px_4px_0px_#0f172a]">MAZE CITY</button>
+            <button onclick="startHost(1)" class="w-full bg-slate-800 text-cyan-400 border-4 border-cyan-400 py-4 rounded-2xl font-black mb-4 shadow-[4px_4px_0px_#06b6d4]">NEON VOID</button>
         </div>
     </div>
 
     <div id="hud" class="fixed top-5 left-0 right-0 flex justify-center gap-4 z-50 pointer-events-none hidden">
         <div id="timerBox" class="status-pill">03:00</div>
-        <div id="roomDisplay" class="status-pill border-blue-500 text-blue-500 pointer-events-auto cursor-pointer">ID: ----</div>
+        <div id="roomDisplay" class="status-pill border-blue-500 text-blue-500">ID: ----</div>
     </div>
 
     <div id="chat-ui" class="hidden">
         <div id="chat-box"></div>
         <div id="chat-input-container">
-            <input type="text" id="chat-input" placeholder="Say..." maxlength="40">
+            <input type="text" id="chat-input" placeholder="Type..." maxlength="40">
             <button id="chat-send">GO</button>
         </div>
     </div>
@@ -101,210 +103,245 @@
 
     <div id="controls" class="hidden">
         <div class="joystick-base" id="joyBase"><div class="joystick-knob" id="joyKnob"></div></div>
-        <div class="emote-wheel">
-            <button class="emote-btn" onclick="sendEmote('😂')">😂</button>
-            <button class="emote-btn" onclick="sendEmote('😡')">😡</button>
-            <button class="emote-btn" onclick="sendEmote('😎')">😎</button>
-        </div>
         <button class="btn-dash" id="dashBtn">DASH</button>
     </div>
 
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <script>
-        // Use window.onload to ensure PeerJS and DOM are ready
-        window.onload = function() {
-            const canvas = document.getElementById('gameCanvas');
-            const ctx = canvas.getContext('2d');
-            let myId, peer, conn, isHost = false, players = {}, myName = "";
-            let joyPos = { x: 0, y: 0 }, isDashing = false;
-            let worldSize = 3000, cam = { x: 1500, y: 1500 };
-            let traps = [], pickups = [], obstacles = [], selectedMap = 0, currentRoomCode = "", gameActive = true;
-            let myColor = "#22c55e", matchTimer = 180, shake = 0;
-            let particles = [];
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        let myId, peer, conn, isHost = false, players = {}, myName = "";
+        let joyPos = { x: 0, y: 0 }, isJoy = false, isDashing = false;
+        let worldSize = 3000, cam = { x: 1500, y: 1500 };
+        let obstacles = [], selectedMap = 0, matchTimer = 180;
+        let mySkin = "green";
+        let activeConnections = [];
 
-            const maps = [
-                { name: "MAP-ING", bg: "#7dd3fc", floor: "#4ade80", wall: "#0f172a", blockColor: "#ffb6c1" },
-                { name: "NEON VOID", bg: "#020617", floor: "#0f172a", wall: "#06b6d4", blockColor: "#1e293b" },
-                { name: "ELMORE HIGH", bg: "#fef3c7", floor: "#d1d5db", wall: "#1e40af", blockColor: "#fbbf24" }
-            ];
+        const maps = [
+            { bg: "#7dd3fc", floor: "#4ade80", wall: "#0f172a" },
+            { bg: "#020617", floor: "#0f172a", wall: "#06b6d4" },
+            { bg: "#bae6fd", floor: "#fbbf24", wall: "#f87171" }
+        ];
 
-            // Skin selection logic
-            document.querySelectorAll('.skin-opt').forEach(opt => {
-                opt.addEventListener('click', () => {
-                    document.querySelectorAll('.skin-opt').forEach(o => o.classList.remove('active'));
-                    opt.classList.add('active');
-                    myColor = opt.getAttribute('data-color');
-                });
-            });
+        // --- CHAT LOGIC ---
+        const chatInput = document.getElementById('chat-input');
+        const chatBox = document.getElementById('chat-box');
+        const chatSend = document.getElementById('chat-send');
 
-            // Button handlers
-            document.getElementById('btn-host-menu').addEventListener('click', () => {
-                if(!document.getElementById('nameInput').value.trim()) return showToast("ENTER NAME!");
-                document.getElementById('mapMenu').classList.remove('hidden');
-            });
+        function addChatMessage(name, msg) {
+            const div = document.createElement('div');
+            div.className = 'chat-bubble';
+            div.innerText = `${name}: ${msg}`;
+            chatBox.appendChild(div);
+            chatBox.scrollTop = chatBox.scrollHeight;
+            setTimeout(() => div.remove(), 7000);
+        }
 
-            document.getElementById('btn-join-room').addEventListener('click', () => {
-                if(!document.getElementById('nameInput').value.trim()) return showToast("ENTER NAME!");
-                setupRoom(false);
-            });
-
-            document.getElementById('cancel-load').onclick = () => {
-                document.getElementById('loading-overlay').style.display = 'none';
-                if(peer) peer.destroy();
-            };
-
-            window.startHost = function(m) { 
-                selectedMap = m; 
-                document.getElementById('mapMenu').classList.add('hidden');
-                setupRoom(true); 
-            };
-
-            function showToast(txt) {
-                const t = document.getElementById('toast'); 
-                t.innerText = txt; t.style.display = 'block';
-                setTimeout(() => t.style.display = 'none', 3000);
+        function sendChat() {
+            const msg = chatInput.value.trim();
+            if(!msg) return;
+            addChatMessage("YOU", msg);
+            chatInput.value = "";
+            if(isHost) {
+                activeConnections.forEach(c => c.send({ type: 'chat', name: myName, msg: msg }));
+            } else if(conn && conn.open) {
+                conn.send({ type: 'chat', name: myName, msg: msg });
             }
+        }
 
-            function setupRoom(host) {
-                const overlay = document.getElementById('loading-overlay');
-                overlay.style.display = 'flex';
-                isHost = host;
-                myName = document.getElementById('nameInput').value.trim().toUpperCase() || "PLAYER";
-                
-                const code = host ? Math.floor(1000 + Math.random()*9000).toString() : document.getElementById('roomInput').value;
-                if(!host && !code) { overlay.style.display = 'none'; return showToast("ENTER CODE"); }
-                currentRoomCode = code;
+        chatSend.onclick = sendChat;
+        chatInput.onkeydown = (e) => { if(e.key === 'Enter') sendChat(); };
 
-                // Cleanup old peer
-                if (peer) peer.destroy();
-                
-                // Use a slightly more unique ID prefix to avoid collisions
-                peer = new Peer('dbz-' + code);
+        // --- GAME LOGIC ---
+        document.querySelectorAll('.skin-opt').forEach(opt => {
+            opt.onclick = () => {
+                document.querySelectorAll('.skin-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                mySkin = opt.dataset.skin;
+            };
+        });
 
-                peer.on('open', (id) => {
-                    overlay.style.display = 'none';
-                    myId = id;
-                    document.getElementById('menu').classList.add('hidden');
-                    document.getElementById('hud').classList.remove('hidden');
-                    document.getElementById('controls').classList.remove('hidden');
-                    document.getElementById('chat-ui').classList.remove('hidden');
-                    document.getElementById('roomDisplay').innerText = "ID: " + code;
-                    
-                    if(host) {
-                        obstacles = generateObstacles(selectedMap);
-                        players[myId] = { x: 500, y: 500, isIt: true, name: myName, color: myColor, protection: 0, frozen: 0, speedBoost: 0, shield: false };
-                        for(let i=0; i<4; i++) pickups.push({x: Math.random()*2600+200, y: Math.random()*2600+200, type: Math.random()>0.5?'speed':'shield'});
-                        requestAnimationFrame(gameLoop);
-                    } else {
-                        conn = peer.connect('dbz-' + code, { reliable: true });
-                        conn.on('open', () => {
-                            conn.send({ type: 'join', name: myName, color: myColor });
-                            requestAnimationFrame(gameLoop);
-                        });
-                        conn.on('data', handleData);
-                    }
+        function openMapSelect() {
+            if(!document.getElementById('nameInput').value.trim()) return;
+            document.getElementById('mapMenu').classList.remove('hidden');
+        }
+
+        function generateObstacles(mapIdx) {
+            const obs = [];
+            obs.push({x: -50, y: -50, w: worldSize+100, h: 50});
+            obs.push({x: -50, y: worldSize, w: worldSize+100, h: 50});
+            obs.push({x: -50, y: -50, w: 50, h: worldSize+100});
+            obs.push({x: worldSize, y: -50, w: 50, h: worldSize+100});
+            for(let i=0; i<20; i++) {
+                obs.push({
+                    x: Math.random() * (worldSize - 600) + 300,
+                    y: Math.random() * (worldSize - 600) + 300,
+                    w: Math.random() > 0.5 ? 250 : 80,
+                    h: Math.random() > 0.5 ? 80 : 250
                 });
+            }
+            return obs;
+        }
 
-                peer.on('error', (err) => {
-                    overlay.style.display = 'none';
-                    if(err.type === 'unavailable-id') showToast("ROOM ALREADY EXISTS!");
-                    else showToast("CONNECTION ERROR");
-                    console.error(err);
-                });
-
+        function setupRoom(host) {
+            document.getElementById('loading-overlay').style.display = 'flex';
+            isHost = host;
+            myName = document.getElementById('nameInput').value.trim().toUpperCase() || "GUEST";
+            const code = host ? Math.floor(1000 + Math.random()*9000).toString() : document.getElementById('roomInput').value;
+            
+            peer = new Peer('tag-' + code);
+            peer.on('open', (id) => {
+                document.getElementById('loading-overlay').style.display = 'none';
+                myId = id;
+                document.getElementById('menu').style.display = 'none';
+                document.getElementById('mapMenu').classList.add('hidden');
+                document.getElementById('hud').classList.remove('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+                document.getElementById('chat-ui').classList.remove('hidden');
+                document.getElementById('roomDisplay').innerText = "ID: " + code;
+                
                 if(host) {
-                    peer.on('connection', (c) => {
-                        c.on('data', (d) => {
-                            if(d.type === 'join') {
-                                players[c.peer] = { x: 2500, y: 2500, isIt: false, name: d.name, color: d.color, protection: 5, frozen: 0, speedBoost: 0, shield: false };
-                                addChatMessage(d.name + " JOINED!");
-                            }
-                            if(d.type === 'chat') { addChatMessage(d.msg, d.name); broadcast({ type: 'chat', name: d.name, msg: d.msg }); }
-                            if(d.type === 'move' && players[c.peer]) { players[c.peer].x = d.x; players[c.peer].y = d.y; }
-                            if(d.type === 'emote') { players[c.peer].emote = d.emote; players[c.peer].emoteTime = Date.now() + 2000; broadcast({type:'emote', id: c.peer, emote: d.emote}); }
-                        });
+                    obstacles = generateObstacles(selectedMap);
+                    players[myId] = { x: 500, y: 500, isIt: true, name: myName, skin: mySkin, protection: 0 };
+                    requestAnimationFrame(gameLoop);
+                } else {
+                    conn = peer.connect('tag-' + code);
+                    conn.on('open', () => {
+                        conn.send({ type: 'join', name: myName, skin: mySkin });
+                        requestAnimationFrame(gameLoop);
+                    });
+                    conn.on('data', (d) => {
+                        if(d.type === 'state') { players = d.players; obstacles = d.obstacles; selectedMap = d.map; matchTimer = d.timer; }
+                        if(d.type === 'chat') addChatMessage(d.name, d.msg);
                     });
                 }
-            }
+            });
 
-            function handleData(d) {
-                if(d.type === 'state') { players = d.players; traps = d.traps; pickups = d.pickups; matchTimer = d.timer; selectedMap = d.map; obstacles = d.obstacles; }
-                if(d.type === 'chat') addChatMessage(d.msg, d.name);
-                if(d.type === 'tag') { showToast(d.msg); shake = 15; }
-                if(d.type === 'emote') { if(players[d.id]) { players[d.id].emote = d.emote; players[d.id].emoteTime = Date.now() + 2000; }}
-                if(d.type === 'gameOver') { gameActive = false; document.getElementById('victory-screen').classList.remove('hidden'); document.getElementById('loser-text').innerText = d.loser + " LOST!"; }
-            }
-
-            function broadcast(data) {
-                if(!isHost || !peer) return;
-                for(let id in peer.connections) {
-                    peer.connections[id].forEach(c => { if(c.open) c.send(data); });
-                }
-            }
-
-            function generateObstacles(mapIdx) {
-                const obs = [];
-                if(mapIdx === 2) { // Elmore High
-                    for(let i=0; i<6; i++) obs.push({ x: 500, y: 400 + i*500, w: 2000, h: 60, type: 'wall' });
-                } else { 
-                    for(let i=0; i<15; i++) obs.push({ x: Math.random()*2500+250, y: Math.random()*2500+250, w: Math.random()>0.5?300:80, h: Math.random()>0.5?80:300, type: 'wall' });
-                }
-                obs.push({ x: worldSize/2-150, y: worldSize/2-150, w: 300, h: 300, type: 'core' });
-                return obs;
-            }
-
-            function drawGumball(ctx) {
-                ctx.fillStyle = '#50bfe6';
-                ctx.beginPath(); ctx.ellipse(0, 0, 45, 42, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.moveTo(-35, -20); ctx.lineTo(-45, -50); ctx.lineTo(-15, -35); ctx.fill();
-                ctx.beginPath(); ctx.moveTo(35, -20); ctx.lineTo(45, -50); ctx.lineTo(15, -35); ctx.fill();
-                ctx.fillStyle = 'white';
-                ctx.beginPath(); ctx.ellipse(-15, -10, 15, 18, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.ellipse(15, -10, 15, 18, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = 'black';
-                ctx.beginPath(); ctx.ellipse(-12, -8, 6, 8, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.beginPath(); ctx.ellipse(18, -8, 6, 8, 0, 0, Math.PI * 2); ctx.fill();
-                ctx.fillStyle = '#ff99cc';
-                ctx.beginPath(); ctx.arc(0, 8, 5, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = 'black'; ctx.lineWidth = 2;
-                ctx.beginPath(); ctx.arc(-6, 15, 6, Math.PI, 0, true); ctx.stroke();
-                ctx.beginPath(); ctx.arc(6, 15, 6, Math.PI, 0, true); ctx.stroke();
-            }
-
-            function gameLoop() {
-                if(!gameActive) return;
-                canvas.width = window.innerWidth; canvas.height = window.innerHeight;
-                const curMap = maps[selectedMap];
-                const me = players[myId];
-
-                if(me) {
-                    let moveSpeed = (isDashing ? 28 : 13) * (me.speedBoost > 0 ? 1.5 : 1);
-                    me.x = Math.max(50, Math.min(worldSize-50, me.x + joyPos.x * moveSpeed));
-                    me.y = Math.max(50, Math.min(worldSize-50, me.y + joyPos.y * moveSpeed));
-                    
-                    // Collision with walls
-                    obstacles.forEach(ob => {
-                        if(me.x > ob.x-45 && me.x < ob.x+ob.w+45 && me.y > ob.y-45 && me.y < ob.y+ob.h+45) {
-                            const dx = me.x - (ob.x + ob.w/2), dy = me.y - (ob.y + ob.h/2);
-                            if(Math.abs(dx/ob.w) > Math.abs(dy/ob.h)) me.x = dx > 0 ? ob.x+ob.w+45 : ob.x-45;
-                            else me.y = dy > 0 ? ob.y+ob.h+45 : ob.y-45;
+            if(host) {
+                peer.on('connection', (c) => {
+                    activeConnections.push(c);
+                    c.on('data', (d) => {
+                        if(d.type === 'join') players[c.peer] = { x: 2500, y: 2500, isIt: false, name: d.name, skin: d.skin, protection: 5 };
+                        if(d.type === 'move' && players[c.peer]) { players[c.peer].x = d.x; players[c.peer].y = d.y; }
+                        if(d.type === 'chat') {
+                            addChatMessage(d.name, d.msg);
+                            activeConnections.forEach(co => { if(co.peer !== c.peer) co.send({ type: 'chat', name: d.name, msg: d.msg }); });
                         }
                     });
+                });
+            }
+        }
 
-                    if(me.speedBoost > 0) me.speedBoost -= 0.016;
-                    cam.x += (me.x - cam.x) * 0.1; cam.y += (me.y - cam.y) * 0.1;
+        function startHost(m) { selectedMap = m; setupRoom(true); }
 
-                    if(isHost) {
-                        matchTimer -= 0.016;
-                        document.getElementById('timerBox').innerText = Math.max(0, Math.floor(matchTimer / 60)).toString().padStart(2, '0') + ":" + Math.floor(matchTimer % 60).toString().padStart(2, '0');
-                        
-                        let itId = Object.keys(players).find(k => players[k].isIt);
-                        let itP = players[itId];
+        // Joystick
+        const joyBase = document.getElementById('joyBase');
+        const handleJoy = (e) => {
+            const touch = e.touches[0];
+            const rect = joyBase.getBoundingClientRect();
+            const dx = touch.clientX - (rect.left + rect.width/2);
+            const dy = touch.clientY - (rect.top + rect.height/2);
+            const dist = Math.min(50, Math.hypot(dx, dy));
+            const angle = Math.atan2(dy, dx);
+            joyPos.x = (Math.cos(angle) * dist) / 50;
+            joyPos.y = (Math.sin(angle) * dist) / 50;
+            document.getElementById('joyKnob').style.transform = `translate(${joyPos.x*35}px, ${joyPos.y*35}px)`;
+        };
+        joyBase.addEventListener('touchstart', (e) => { e.preventDefault(); isJoy = true; handleJoy(e); });
+        window.addEventListener('touchmove', (e) => { if(isJoy) handleJoy(e); });
+        window.addEventListener('touchend', (e) => { if(e.touches.length === 0) { isJoy = false; joyPos = {x:0, y:0}; document.getElementById('joyKnob').style.transform = 'translate(0,0)'; } });
+        document.getElementById('dashBtn').addEventListener('touchstart', (e) => { e.preventDefault(); isDashing = true; });
+        document.getElementById('dashBtn').addEventListener('touchend', () => { isDashing = false; });
 
-                        for(let id in players) {
-                            let p = players[id];
-                            if(p.protection > 0) p.protection -= 0.016;
+        function moveWithCollision(p, dx, dy) {
+            let nX = p.x + dx, nY = p.y + dy, rad = 55;
+            let okX = true, okY = true;
+            for(let ob of obstacles) {
+                if(nX+rad > ob.x && nX-rad < ob.x+ob.w && p.y+rad > ob.y && p.y-rad < ob.y+ob.h) okX = false;
+                if(p.x+rad > ob.x && p.x-rad < ob.x+ob.w && nY+rad > ob.y && nY-rad < ob.y+ob.h) okY = false;
+            }
+            if(okX) p.x = nX; if(okY) p.y = nY;
+        }
 
-                            if(itP && id !== itId) {
-                                let dist = Math.hypot(p.x - itP.x, p.y - itP.y);
-                                if(di
+        function drawPlayer(p, id) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            if(p.isIt) { ctx.shadowBlur = 40; ctx.shadowColor = 'red'; ctx.strokeStyle = 'red'; ctx.lineWidth = 10; ctx.strokeRect(-65,-65,130,130); }
+
+            let bodyCol = p.skin === "black" ? "#0f172a" : p.skin === "gumball" ? "#7dd3fc" : p.skin === "darwin" ? "#f97316" : p.skin === "cook" ? "#f8fafc" : "#22c55e";
+            
+            // Outer Border
+            ctx.fillStyle = (bodyCol === "#0f172a") ? "#475569" : "#0f172a"; 
+            ctx.beginPath(); ctx.roundRect(-60,-60,120,120,30); ctx.fill();
+            
+            // Body
+            ctx.fillStyle = bodyCol;
+            ctx.beginPath(); ctx.roundRect(-50,-50,100,100,25); ctx.fill();
+
+            if(p.skin === "gumball") {
+                ctx.fillStyle = "#fde68a"; ctx.beginPath(); ctx.roundRect(-30, 0, 60, 40, 15); ctx.fill();
+                ctx.fillStyle = "#f87171"; ctx.beginPath(); ctx.arc(0, 5, 8, 0, Math.PI*2); ctx.fill();
+            } else if(p.skin === "darwin") {
+                // Classic Green Shoes (Sneakers)
+                ctx.fillStyle = "#4ade80"; // Shoe Green
+                ctx.beginPath(); ctx.roundRect(-45, 40, 40, 25, 8); ctx.fill(); // Left
+                ctx.beginPath(); ctx.roundRect(5, 40, 40, 25, 8); ctx.fill(); // Right
+                // White Laces Detail
+                ctx.fillStyle = "white";
+                ctx.fillRect(-35, 48, 20, 4); ctx.fillRect(15, 48, 20, 4);
+            } else if(p.skin === "cook") {
+                ctx.fillStyle = "white"; ctx.strokeStyle = "#0f172a"; ctx.lineWidth = 4;
+                ctx.beginPath(); ctx.roundRect(-40, -115, 80, 65, 12); ctx.fill(); ctx.stroke();
+            }
+
+            const eX = (id === myId ? joyPos.x : 0) * 8, eY = (id === myId ? joyPos.y : 0) * 8;
+            ctx.fillStyle = 'white';
+            ctx.beginPath(); ctx.roundRect(-28, -25, 22, 22, 6); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(6, -25, 22, 22, 6); ctx.fill();
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.roundRect(-20+eX, -17+eY, 10, 10, 3); ctx.fill();
+            ctx.beginPath(); ctx.roundRect(14+eX, -17+eY, 10, 10, 3); ctx.fill();
+
+            ctx.fillStyle = 'white'; ctx.font = "900 40px Outfit"; ctx.textAlign = "center";
+            ctx.fillText(p.name, 0, -135);
+            ctx.restore();
+        }
+
+        function gameLoop() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            const curMap = maps[selectedMap];
+            const me = players[myId];
+            if(me) {
+                const speed = isDashing ? 26 : 12;
+                moveWithCollision(me, joyPos.x * speed, joyPos.y * speed);
+                cam.x += (me.x - cam.x) * 0.1; cam.y += (me.y - cam.y) * 0.1;
+                if(isHost) {
+                    matchTimer -= 0.016;
+                    let itId = Object.keys(players).find(k => players[k].isIt);
+                    for(let id in players) {
+                        if(id !== itId) {
+                            if(players[id].protection > 0) players[id].protection -= 0.016;
+                            if(Math.hypot(players[id].x-players[itId].x, players[id].y-players[itId].y) < 110 && players[id].protection <= 0) {
+                                players[itId].isIt = false; players[itId].protection = 3;
+                                players[id].isIt = true; players[id].protection = 3;
+                            }
+                        }
+                    }
+                    activeConnections.forEach(c => c.send({type:'state', players, obstacles, map: selectedMap, timer: matchTimer}));
+                } else if(conn?.open) conn.send({ type: 'move', x: me.x, y: me.y });
+            }
+            ctx.fillStyle = curMap.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
+            ctx.save(); ctx.translate(canvas.width/2, canvas.height/2); ctx.scale(0.4, 0.4); ctx.translate(-cam.x, -cam.y);
+            ctx.fillStyle = curMap.floor; ctx.fillRect(0,0,worldSize,worldSize);
+            obstacles.forEach(ob => { ctx.fillStyle = curMap.wall; ctx.beginPath(); ctx.roundRect(ob.x, ob.y, ob.w, ob.h, 20); ctx.fill(); });
+            for(let id in players) drawPlayer(players[id], id);
+            ctx.restore();
+            const min = Math.floor(Math.max(0, matchTimer)/60), sec = Math.floor(Math.max(0, matchTimer)%60);
+            document.getElementById('timerBox').innerText = `${min}:${sec.toString().padStart(2, '0')}`;
+            requestAnimationFrame(gameLoop);
+        }
+    </script>
+</body>
+</html>
+
+
