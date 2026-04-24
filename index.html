@@ -1,390 +1,548 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>TAG ATTACK v1.18 - Fixed</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;900&display=swap');
-        body { font-family: 'Outfit', sans-serif; touch-action: none; overflow: hidden; background: #7dd3fc; user-select: none; margin: 0; padding: 0; }
-        canvas { display: block; width: 100vw; height: 100vh; background: #7dd3fc; }
-        
-        .gumball-panel { background: #ffffff; border: 6px solid #0f172a; box-shadow: 10px 10px 0px #0f172a; border-radius: 35px; }
-        .status-pill {
-            background: white; border: 4px solid #0f172a; padding: 8px 20px;
-            border-radius: 15px; font-weight: 900; font-size: 18px;
-            box-shadow: 4px 4px 0px #0f172a; color: #0f172a;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>APEX POINT | High Speed Dubai</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
 
-        #chat-ui { position: fixed; bottom: 180px; left: 20px; width: 220px; z-index: 100; pointer-events: none; display: flex; flex-direction: column; }
-        #chat-box { max-height: 120px; overflow-y: hidden; display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; }
-        .chat-bubble { background: rgba(15, 23, 42, 0.85); color: white; padding: 6px 12px; border-radius: 12px; font-size: 11px; font-weight: 800; width: fit-content; animation: fadeIn 0.3s ease; border: 1px solid rgba(255,255,255,0.1); word-break: break-word; }
-        #chat-input-container { pointer-events: auto; display: flex; background: white; border: 3px solid #0f172a; border-radius: 12px; overflow: hidden; height: 35px; }
-        #chat-input { flex: 1; background: transparent; border: none; padding: 0 10px; font-weight: 900; font-size: 12px; outline: none; color: #0f172a; }
-        #chat-send { background: #fbbf24; border-left: 3px solid #0f172a; padding: 0 10px; font-weight: 900; font-size: 11px; cursor: pointer; }
+  * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
+  body {
+    background: #87ceeb;
+    overflow: hidden;
+    font-family: 'Orbitron', sans-serif;
+    color: #fff;
+    user-select: none;
+  }
 
-        .joystick-base { width: 100px; height: 100px; background: rgba(15, 23, 42, 0.1); border: 4px solid #0f172a; border-radius: 50%; position: fixed; bottom: 40px; left: 40px; display: flex; align-items: center; justify-content: center; z-index: 50; }
-        .joystick-knob { width: 40px; height: 40px; background: #fbbf24; border: 4px solid #0f172a; border-radius: 50%; pointer-events: none; }
-        
-        .btn-dash { position: fixed; bottom: 40px; right: 40px; width: 100px; height: 100px; background: #ef4444; border: 5px solid #0f172a; box-shadow: 6px 6px 0px #0f172a; border-radius: 25px; color: white; font-weight: 900; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 50; transition: all 0.1s; font-size: 18px; }
-        .btn-dash:active { transform: translate(3px, 3px); box-shadow: 3px 3px 0px #0f172a; }
-        .stamina-bar { width: 60%; height: 6px; background: rgba(0,0,0,0.2); border-radius: 3px; margin-top: 5px; overflow: hidden; }
-        .stamina-fill { height: 100%; background: #4ade80; width: 100%; transition: width 0.1s; }
+  #canvas { display: block; width: 100vw; height: 100vh; }
 
-        .skin-opt { width: 45px; height: 45px; border: 4px solid #0f172a; border-radius: 12px; cursor: pointer; transition: 0.2s; position: relative; overflow: hidden; }
-        .skin-opt.active { transform: scale(1.2); border-color: #fbbf24; z-index: 10; }
+  #hud {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 10;
+  }
 
-        #loading-overlay { position: fixed; inset: 0; background: rgba(125, 211, 252, 0.9); z-index: 500; display: none; align-items: center; justify-content: center; font-weight: 900; font-size: 24px; color: #0f172a; }
-        #error-msg { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #ef4444; color: white; padding: 10px 20px; border-radius: 10px; font-weight: 900; z-index: 1000; display: none; }
-    </style>
+  #mini-map {
+    position: absolute;
+    top: 20px; right: 20px;
+    width: 70px; height: 160px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255,255,255,0.8);
+    border-radius: 8px;
+    backdrop-filter: blur(5px);
+    overflow: hidden;
+  }
+  #map-player {
+    position: absolute;
+    width: 6px; height: 10px;
+    background: #00ff88;
+    left: 50%; bottom: 15px;
+    transform: translateX(-50%);
+    box-shadow: 0 0 8px #00ff88;
+    z-index: 2;
+  }
+
+  #stats-panel {
+    position: absolute;
+    top: 20px; left: 20px;
+    background: rgba(0,0,0,0.5);
+    padding: 10px;
+    border-radius: 8px;
+  }
+
+  #score-panel {
+    position: absolute;
+    top: 20px; left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    background: rgba(0,0,0,0.4);
+    padding: 5px 20px;
+    border-radius: 20px;
+  }
+  #score-val { font-size: 32px; font-weight: 700; }
+
+  #speedometer-stack {
+    position: absolute;
+    bottom: 220px; 
+    left: 20px;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(0,0,0,0.4);
+    padding: 12px;
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  #speed-display { display: flex; align-items: baseline; gap: 5px; }
+  #speed-val { font-size: 48px; font-weight: 900; color: #fff; line-height: 1; }
+  .kmh-unit { font-size: 12px; color: #00ff88; font-weight: 800; }
+
+  #nitro-track {
+    width: 160px; height: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  #nitro-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    width: 100%;
+    box-shadow: 0 0 10px #00f2fe;
+    transition: width 0.1s linear;
+  }
+
+  .screen {
+    position: fixed; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    z-index: 20; background: linear-gradient(to bottom, #87ceeb 0%, #e0f6ff 100%);
+  }
+  .hidden { display: none !important; }
+
+  .game-title {
+    font-size: clamp(36px, 8vw, 64px);
+    font-weight: 900; letter-spacing: 4px; color: #111;
+    margin-bottom: 20px; text-shadow: 2px 2px 0px #00ff88;
+  }
+
+  #credits-bar {
+    background: rgba(0,0,0,0.85);
+    color: #00ff88;
+    padding: 10px 25px;
+    border-radius: 30px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(0,255,136,0.3);
+    text-align: center;
+  }
+
+  .car-selection {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+  }
+  .car-opt {
+    width: 80px; height: 45px;
+    border: 2px solid #111;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: bold; font-size: 12px; color: #000;
+  }
+  .car-opt.active { border-color: #00ff88; background: #00ff88; }
+
+  .btn {
+    pointer-events: all; cursor: pointer;
+    background: #111; color: #fff;
+    font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700;
+    padding: 15px; border: none; border-radius: 8px;
+    width: 250px; margin-bottom: 12px; transition: 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn:active { transform: scale(0.95); }
+  .btn.outline { background: transparent; border: 2px solid #111; color: #111; }
+
+  #damage-flash {
+    position: fixed; inset: 0;
+    background: red; opacity: 0;
+    pointer-events: none; z-index: 100;
+  }
+
+  #touch-controls {
+    position: fixed; bottom: 20px; left: 0; right: 0;
+    height: 180px; pointer-events: none; z-index: 15;
+  }
+  .t-btn {
+    pointer-events: all; background: rgba(0,0,0,0.3);
+    border: 2px solid rgba(255,255,255,0.4); border-radius: 20px;
+    display: flex; align-items: center; justify-content: center; color: white;
+    backdrop-filter: blur(5px);
+  }
+  .t-btn.active { background: rgba(0,255,136,0.6); }
+  
+  #t-steer { position: absolute; left: 20px; bottom: 0; display: flex; gap: 15px; }
+  #t-actions { position: absolute; right: 20px; bottom: 0; display: flex; gap: 10px; flex-direction: column; }
+  .circle { width: 90px; height: 90px; font-size: 28px; border-radius: 50%; }
+  .pedal { width: 90px; height: 120px; font-size: 14px; font-weight: bold; }
+
+  @media (min-width: 769px) { #touch-controls { display: none; } }
+</style>
 </head>
 <body>
 
-    <div id="loading-overlay">CONNECTING...</div>
-    <div id="error-msg">ERROR!</div>
+<canvas id="canvas"></canvas>
+<div id="damage-flash"></div>
 
-    <div id="menu" class="fixed inset-0 z-[150] flex flex-col items-center justify-center p-4 bg-[#7dd3fc]">
-        <div class="gumball-panel p-8 w-full max-w-sm text-center">
-            <h1 class="text-5xl font-black italic text-slate-800 uppercase mb-1">TAG ATTACK</h1>
-            <p class="text-red-600 font-black mb-6 text-sm italic tracking-widest uppercase">V1.18 STABLE</p>
-            <input type="text" id="nameInput" placeholder="YOUR NAME" class="w-full bg-slate-50 border-4 border-slate-800 p-4 rounded-2xl text-center font-black text-xl outline-none uppercase mb-4">
-            
-            <p class="text-xs font-bold text-slate-500 mb-2 uppercase">Select Skin</p>
-            <div class="flex flex-wrap justify-center gap-2 mb-8">
-                <div class="skin-opt active" data-skin="green" style="background: #22c55e;"></div>
-                <div class="skin-opt" data-skin="black" style="background: #0f172a;"></div>
-                <div class="skin-opt" data-skin="gumball" style="background: #7dd3fc; border-bottom: 8px solid #fde68a;"></div>
-                <div class="skin-opt" data-skin="darwin" style="background: #f97316; border-bottom: 8px solid #4ade80;"></div>
-            </div>
-
-            <div class="space-y-4">
-                <button onclick="openMapSelect()" class="w-full bg-yellow-400 border-4 border-slate-800 shadow-[6px_6px_0px_#0f172a] font-black py-4 rounded-2xl text-xl uppercase active:translate-y-1">HOST ROOM</button>
-                <div class="flex gap-2">
-                    <input type="text" id="roomInput" maxlength="4" placeholder="CODE" class="w-1/3 bg-white border-4 border-slate-800 rounded-2xl text-center font-black">
-                    <button onclick="setupRoom(false)" class="w-2/3 bg-emerald-400 border-4 border-slate-800 shadow-[4px_4px_0px_#0f172a] font-black py-4 rounded-2xl text-lg uppercase active:translate-y-1">JOIN</button>
-                </div>
-            </div>
-        </div>
+<div id="hud" class="hidden">
+  <div id="stats-panel">
+    <div style="font-size:9px; color:#00ff88; margin-bottom:2px">HULL</div>
+    <div id="durability">♥♥♥</div>
+  </div>
+  
+  <div id="mini-map"><div id="map-player"></div></div>
+  
+  <div id="score-panel">
+    <div id="score-val">0</div>
+  </div>
+  
+  <div id="speedometer-stack">
+    <div id="speed-display">
+      <div id="speed-val">0</div>
+      <div class="kmh-unit">KM/H</div>
     </div>
+    <div id="nitro-track"><div id="nitro-fill"></div></div>
+    <div style="font-size:8px; letter-spacing: 1px; opacity:0.8">NITRO CHARGE</div>
+  </div>
+</div>
 
-    <div id="mapMenu" class="fixed inset-0 z-[160] flex flex-col items-center justify-center p-4 bg-[#7dd3fc] hidden">
-        <div class="gumball-panel p-8 w-full max-w-sm text-center">
-            <h2 class="text-3xl font-black mb-6 italic uppercase">ARENA</h2>
-            <button onclick="startHost(2)" class="w-full bg-blue-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4 shadow-[4px_4px_0px_#0f172a] text-white italic">ELMORE SUBURBS</button>
-            <button onclick="startHost(0)" class="w-full bg-emerald-400 border-4 border-slate-800 py-4 rounded-2xl font-black mb-4 shadow-[4px_4px_0px_#0f172a]">MAZE CITY</button>
-        </div>
+<div class="screen" id="start-screen">
+  <div class="game-title">APEX POINT</div>
+  
+  <div id="credits-bar">
+    THANKS: BASIL • ASHMITH • EDWIN • DEV
+  </div>
+
+  <div style="color:#111; margin-bottom:10px; font-size:12px; font-weight:bold; letter-spacing:1px">SELECT VEHICLE</div>
+  <div class="car-selection">
+    <div class="car-opt active" onclick="selectCar(0, this)">GREY</div>
+    <div class="car-opt" onclick="selectCar(1, this)" style="color:#ff4444">RED</div>
+    <div class="car-opt" onclick="selectCar(2, this)" style="color:#4facfe">BLUE</div>
+  </div>
+
+  <button class="btn" onclick="startGame()">START DRIVE</button>
+  <div style="color: #444; font-size: 10px; letter-spacing: 2px; font-weight: bold; margin-top: 20px;">DUMB BRAINEZ PRODUCTIONS</div>
+</div>
+
+<div class="screen hidden" id="gameover-screen">
+  <div class="game-title" style="color:#ff4444">TOTALED</div>
+  <div style="text-align: center; margin-bottom: 25px;">
+    <p style="color:#111; font-size:14px; font-weight:bold; opacity:0.6">DISTANCE SCORE</p>
+    <h1 id="final-score" style="font-size: 72px; color: #111;">0</h1>
+  </div>
+  
+  <button class="btn" onclick="startGame()">RETRY RUN</button>
+  <button class="btn outline" onclick="goHome()">HOME MENU</button>
+</div>
+
+<div id="touch-controls">
+  <div id="t-steer">
+    <div class="t-btn circle" id="btn-left">◀</div>
+    <div class="t-btn circle" id="btn-right">▶</div>
+  </div>
+  <div id="t-actions">
+    <div class="t-btn" id="btn-nitro" style="height:45px; border-radius:25px; font-size:11px; font-weight:bold;">NITRO</div>
+    <div style="display:flex; gap:10px">
+        <div class="t-btn pedal" id="btn-brake">BRAKE</div>
+        <div class="t-btn pedal" id="btn-accel" style="border-color:#00ff88">GAS</div>
     </div>
+  </div>
+</div>
 
-    <div id="hud" class="fixed top-5 left-0 right-0 flex justify-center gap-4 z-50 pointer-events-none hidden">
-        <div id="timerBox" class="status-pill">03:00</div>
-        <div id="roomDisplay" class="status-pill border-blue-500 text-blue-500">ID: ----</div>
-    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/**
+ * APEX POINT - Realistic High Speed
+ * Developer: Dumb brainez
+ */
 
-    <div id="chat-ui" class="hidden">
-        <div id="chat-box"></div>
-        <div id="chat-input-container">
-            <input type="text" id="chat-input" placeholder="Chat..." maxlength="30">
-            <button id="chat-send">GO</button>
-        </div>
-    </div>
+let gameState = 'START';
+let score = 0;
+let speed = 0;
+let nitro = 100;
+let playerX = 0;
+let lives = 3;
+let selectedCarColor = 0x888888;
+const traffic = [];
+const keys = {};
 
-    <canvas id="gameCanvas"></canvas>
+const MAX_SPD_BASE = 2.5; 
+const MAX_SPD_NITRO = 3.2;
+const TRAFFIC_SPD = 1.0;
+const SCORE_RATE = 0.05;
 
-    <div id="controls" class="hidden">
-        <div class="joystick-base" id="joyBase"><div class="joystick-knob" id="joyKnob"></div></div>
-        <button class="btn-dash" id="dashBtn">
-            DASH
-            <div class="stamina-bar"><div id="staminaFill" class="stamina-fill"></div></div>
-        </button>
-    </div>
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.1, 2000);
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
-    <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        let myId, peer, conn, isHost = false, players = {}, myName = "";
-        let joyPos = { x: 0, y: 0 }, isJoy = false, isDashing = false, stamina = 100;
-        let worldSize = 3000, cam = { x: 1500, y: 1500 };
-        let obstacles = [], selectedMap = 0, matchTimer = 180;
-        let mySkin = "green";
-        let activeConnections = [];
-        let networkTick = 0;
+const ambient = new THREE.AmbientLight(0xffffff, 0.85);
+const sun = new THREE.DirectionalLight(0xfff5e1, 1.7);
+sun.position.set(100, 200, -100);
+scene.add(ambient, sun);
 
-        const maps = [
-            { bg: "#7dd3fc", floor: "#4ade80", wall: "#0f172a" },
-            { bg: "#020617", floor: "#0f172a", wall: "#06b6d4" },
-            { bg: "#bae6fd", floor: "#fbbf24", wall: "#f87171" }
-        ];
+function createDetailedCar(color, isPlayer = false) {
+    const car = new THREE.Group();
+    
+    const bodyMat = new THREE.MeshStandardMaterial({color: color, metalness: 0.8, roughness: 0.2});
+    const glassMat = new THREE.MeshStandardMaterial({color: 0x111111, metalness: 1, roughness: 0.1, transparent: true, opacity: 0.9});
+    const lightMat = new THREE.MeshBasicMaterial({color: 0xffffff}); 
+    const tailMat = new THREE.MeshBasicMaterial({color: 0xff0000}); 
+    const blackMat = new THREE.MeshStandardMaterial({color: 0x111111});
 
-        function showError(txt) {
-            const el = document.getElementById('error-msg');
-            el.innerText = txt; el.style.display = 'block';
-            setTimeout(() => el.style.display = 'none', 3000);
-        }
+    // Body
+    const body = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.6, 5.0), bodyMat);
+    body.position.y = 0.45;
+    car.add(body);
 
-        // Chat Logic
-        const chatInput = document.getElementById('chat-input');
-        const chatBox = document.getElementById('chat-box');
-        const chatSend = document.getElementById('chat-send');
+    // Cabin
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.2), glassMat);
+    cabin.position.set(0, 0.9, 0.4);
+    car.add(cabin);
+    
+    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.1, 1.8), bodyMat);
+    roof.position.set(0, 1.15, 0.4);
+    car.add(roof);
 
-        function addChatMessage(name, msg) {
-            const div = document.createElement('div');
-            div.className = 'chat-bubble';
-            div.innerText = `${name}: ${msg}`;
-            chatBox.appendChild(div);
-            chatBox.scrollTop = chatBox.scrollHeight;
-            setTimeout(() => div.remove(), 5000);
-        }
+    // Spoiler
+    const spoilerPostL = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.4, 0.1), blackMat);
+    spoilerPostL.position.set(-0.8, 0.9, 2.3);
+    car.add(spoilerPostL);
+    
+    const spoilerPostR = spoilerPostL.clone();
+    spoilerPostR.position.x = 0.8;
+    car.add(spoilerPostR);
+    
+    const wing = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.05, 0.6), bodyMat);
+    wing.position.set(0, 1.1, 2.3);
+    car.add(wing);
 
-        function sendChat() {
-            const msg = chatInput.value.trim();
-            if(!msg) return;
-            addChatMessage("YOU", msg);
-            chatInput.value = "";
-            if(isHost) {
-                activeConnections.forEach(c => c.send({ type: 'chat', name: myName, msg: msg }));
-            } else if(conn && conn.open) {
-                conn.send({ type: 'chat', name: myName, msg: msg });
+    // Headlights (Pointed Forward)
+    const lightL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.15, 0.1), lightMat);
+    lightL.position.set(-0.8, 0.55, -2.46);
+    car.add(lightL);
+    
+    const lightR = lightL.clone();
+    lightR.position.x = 0.8;
+    car.add(lightR);
+
+    // Tail lights
+    const tailL = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.15, 0.1), tailMat);
+    tailL.position.set(-0.8, 0.6, 2.46);
+    car.add(tailL);
+
+    const tailR = tailL.clone();
+    tailR.position.x = 0.8;
+    car.add(tailR);
+
+    // Side Mirrors
+    const mirrorL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.15, 0.15), bodyMat);
+    mirrorL.position.set(-1.25, 0.85, -0.2);
+    car.add(mirrorL);
+
+    const mirrorR = mirrorL.clone();
+    mirrorR.position.x = 1.25;
+    car.add(mirrorR);
+
+    // Wheels
+    const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
+    wheelGeo.rotateZ(Math.PI/2);
+    const wheelMat = new THREE.MeshStandardMaterial({color: 0x222222});
+    
+    const wPos = [[-1, 0.4, 1.6], [1, 0.4, 1.6], [-1, 0.4, -1.6], [1, 0.4, -1.6]];
+    wPos.forEach(p => {
+        const w = new THREE.Mesh(wheelGeo, wheelMat);
+        w.position.set(...p);
+        car.add(w);
+    });
+
+    return car;
+}
+
+function selectCar(index, el) {
+    const colors = [0x888888, 0xff4444, 0x4facfe];
+    selectedCarColor = colors[index];
+    document.querySelectorAll('.car-opt').forEach(opt => opt.classList.remove('active'));
+    el.classList.add('active');
+    
+    scene.remove(player);
+    player = createDetailedCar(selectedCarColor, true);
+    scene.add(player);
+}
+
+let player = createDetailedCar(selectedCarColor, true);
+scene.add(player);
+
+function createBuilding() {
+    const h = 50 + Math.random() * 120;
+    const b = new THREE.Mesh(
+        new THREE.BoxGeometry(22, h, 22), 
+        new THREE.MeshStandardMaterial({
+            color: [0xcccccc, 0xaaaaaa, 0xeeeeee, 0x333333][Math.floor(Math.random()*4)],
+            metalness: 0.5, roughness: 0.2
+        })
+    );
+    b.position.y = h/2;
+    return b;
+}
+
+const segments = [];
+const SEG_SIZE = 100;
+const SEG_COUNT = 15;
+
+function createSegment(z) {
+    const group = new THREE.Group();
+    const ground = new THREE.Mesh(new THREE.PlaneGeometry(1500, SEG_SIZE), new THREE.MeshStandardMaterial({color: 0x388e3c}));
+    ground.rotation.x = -Math.PI/2;
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(24, SEG_SIZE), new THREE.MeshStandardMaterial({color: 0x181818}));
+    road.rotation.x = -Math.PI/2; road.position.y = 0.05;
+    
+    group.add(ground, road);
+
+    for(let i=0; i<10; i++) {
+        let x = (45 + Math.random()*180) * (Math.random() > 0.5 ? 1 : -1);
+        let posZ = (Math.random() - 0.5) * SEG_SIZE;
+        const b = createBuilding(); b.position.set(x, 0, posZ); group.add(b);
+    }
+    group.position.z = z;
+    scene.add(group);
+    return group;
+}
+
+function goHome() {
+    gameState = 'START';
+    document.getElementById('gameover-screen').classList.add('hidden');
+    document.getElementById('start-screen').classList.remove('hidden');
+    document.getElementById('hud').classList.add('hidden');
+}
+
+function startGame() {
+    gameState = 'PLAY';
+    score = 0; speed = 0; nitro = 100; playerX = 0; lives = 3;
+    traffic.forEach(t => { if(t.dot) t.dot.remove(); scene.remove(t); });
+    traffic.length = 0;
+    segments.forEach(s => scene.remove(s));
+    segments.length = 0;
+    
+    document.getElementById('start-screen').classList.add('hidden');
+    document.getElementById('gameover-screen').classList.add('hidden');
+    document.getElementById('hud').classList.remove('hidden');
+    
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.Fog(0x87ceeb, 200, 1400);
+    for(let i=0; i<SEG_COUNT; i++) segments.push(createSegment(-i * SEG_SIZE));
+    updateHUD();
+}
+
+function updateHUD() {
+    document.getElementById('durability').innerText = '♥'.repeat(lives);
+}
+
+function spawnTraffic() {
+    if (gameState !== 'PLAY') return;
+    // Updated lanes: Far Left (-9), Mid Left (-3), Mid Right (3), Far Right (9)
+    const lanes = [-9, -3, 3, 9];
+    const lane = lanes[Math.floor(Math.random() * lanes.length)];
+    
+    const tColor = [0xffffff, 0xffcc00, 0x555555][Math.floor(Math.random()*3)];
+    const car = createDetailedCar(tColor);
+    car.position.set(lane, 0.0, -800);
+    car.speed = TRAFFIC_SPD;
+    
+    const dot = document.createElement('div');
+    dot.style.cssText = "position:absolute; width:5px; height:5px; background:#ff4444; border-radius:50%; left:50%; transform:translateX(-50%);";
+    document.getElementById('mini-map').appendChild(dot);
+    car.dot = dot;
+    
+    scene.add(car);
+    traffic.push(car);
+}
+setInterval(spawnTraffic, 600);
+
+function update() {
+    if (gameState !== 'PLAY') return;
+
+    if (keys['ArrowLeft'] || keys['KeyA'] || keys['left']) playerX -= 0.38;
+    if (keys['ArrowRight'] || keys['KeyD'] || keys['right']) playerX += 0.38;
+    playerX = Math.max(-11, Math.min(11, playerX));
+    player.position.x += (playerX - player.position.x) * 0.16;
+    player.rotation.z = (playerX - player.position.x) * -0.12;
+
+    const isNitro = (keys['ShiftLeft'] || keys['nitro']) && nitro > 1;
+    let target = keys['ArrowUp'] || keys['accel'] ? MAX_SPD_BASE : 0.8;
+    if (keys['ArrowDown'] || keys['brake']) target = 0.2;
+    if (isNitro) { target = MAX_SPD_NITRO; nitro -= 0.65; } 
+    else if(nitro < 100) { nitro += 0.15; }
+    
+    speed += (target - speed) * 0.045;
+    score += speed * SCORE_RATE; 
+
+    segments.forEach(seg => {
+        seg.position.z += speed;
+        if(seg.position.z > SEG_SIZE) seg.position.z -= SEG_COUNT * SEG_SIZE;
+    });
+
+    for(let i=traffic.length-1; i>=0; i--) {
+        const t = traffic[i];
+        t.position.z += speed - t.speed;
+        const relativeZ = Math.abs(t.position.z);
+        t.dot.style.bottom = (160 - (relativeZ * 0.4)) + 'px';
+        t.dot.style.left = `calc(50% + ${t.position.x * 2.5}px)`;
+
+        if (Math.abs(t.position.x - player.position.x) < 2.1 && Math.abs(t.position.z - player.position.z) < 4.6) {
+            document.getElementById('damage-flash').style.opacity = '0.5';
+            setTimeout(() => document.getElementById('damage-flash').style.opacity = '0', 100);
+            lives--; updateHUD();
+            t.dot.remove(); scene.remove(t); traffic.splice(i, 1);
+            speed *= 0.1;
+            if (lives <= 0) {
+                gameState = 'GAMEOVER';
+                document.getElementById('gameover-screen').classList.remove('hidden');
+                document.getElementById('final-score').innerText = Math.floor(score);
             }
+            continue;
         }
-        chatSend.onclick = sendChat;
+        if(t.position.z > 50) { t.dot.remove(); scene.remove(t); traffic.splice(i, 1); }
+    }
 
-        document.querySelectorAll('.skin-opt').forEach(opt => {
-            opt.onclick = () => {
-                document.querySelectorAll('.skin-opt').forEach(o => o.classList.remove('active'));
-                opt.classList.add('active');
-                mySkin = opt.dataset.skin;
-            };
-        });
+    camera.position.set(player.position.x * 0.2, 5.4 + (speed * 0.2), 14 + (speed * 1.6));
+    camera.lookAt(player.position.x, 1.4, -120);
 
-        function openMapSelect() {
-            if(!document.getElementById('nameInput').value.trim()) { showError("ENTER NAME!"); return; }
-            document.getElementById('mapMenu').classList.remove('hidden');
-        }
+    document.getElementById('speed-val').innerText = Math.floor(speed * 100);
+    document.getElementById('score-val').innerText = Math.floor(score);
+    document.getElementById('nitro-fill').style.width = nitro + '%';
+    document.getElementById('map-player').style.left = `calc(50% + ${player.position.x * 2.5}px)`;
+}
 
-        function generateObstacles(mapIdx) {
-            const obs = [];
-            // Borders
-            obs.push({x: -50, y: -50, w: worldSize+100, h: 50}, {x: -50, y: worldSize, w: worldSize+100, h: 50}, {x: -50, y: -50, w: 50, h: worldSize+100}, {x: worldSize, y: -50, w: 50, h: worldSize+100});
-            // Random blocks
-            for(let i=0; i<15; i++) {
-                obs.push({
-                    x: Math.random() * (worldSize - 600) + 300,
-                    y: Math.random() * (worldSize - 600) + 300,
-                    w: Math.random() > 0.5 ? 300 : 100,
-                    h: Math.random() > 0.5 ? 100 : 300
-                });
-            }
-            return obs;
-        }
+window.onkeydown = e => keys[e.code] = true;
+window.onkeyup = e => keys[e.code] = false;
 
-        function setupRoom(host) {
-            const rawCode = document.getElementById('roomInput').value.trim();
-            if(!host && !rawCode) { showError("ENTER ROOM CODE!"); return; }
-            
-            document.getElementById('loading-overlay').style.display = 'flex';
-            isHost = host;
-            myName = document.getElementById('nameInput').value.trim().toUpperCase() || "GUEST";
-            const code = host ? Math.floor(1000 + Math.random()*9000).toString() : rawCode;
-            
-            peer = new Peer('tag-' + code);
-            
-            peer.on('open', (id) => {
-                document.getElementById('loading-overlay').style.display = 'none';
-                myId = id;
-                document.getElementById('menu').style.display = 'none';
-                document.getElementById('mapMenu').classList.add('hidden');
-                document.getElementById('hud').classList.remove('hidden');
-                document.getElementById('controls').classList.remove('hidden');
-                document.getElementById('chat-ui').classList.remove('hidden');
-                document.getElementById('roomDisplay').innerText = "ID: " + code;
-                
-                window.addEventListener('resize', resizeCanvas);
-                resizeCanvas();
+const bind = (id, k) => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    el.ontouchstart = e => { e.preventDefault(); keys[k] = true; el.classList.add('active'); };
+    el.ontouchend = e => { e.preventDefault(); keys[k] = false; el.classList.remove('active'); };
+};
+bind('btn-left', 'left'); bind('btn-right', 'right');
+bind('btn-accel', 'accel'); bind('btn-brake', 'brake');
+bind('btn-nitro', 'nitro');
 
-                if(host) {
-                    obstacles = generateObstacles(selectedMap);
-                    players[myId] = { x: 500, y: 500, isIt: true, name: myName, skin: mySkin, protection: 0 };
-                    requestAnimationFrame(gameLoop);
-                } else {
-                    conn = peer.connect('tag-' + code);
-                    conn.on('open', () => {
-                        conn.send({ type: 'join', name: myName, skin: mySkin });
-                        requestAnimationFrame(gameLoop);
-                    });
-                    conn.on('data', (d) => {
-                        if(d.type === 'state') { players = d.players; obstacles = d.obstacles; selectedMap = d.map; matchTimer = d.timer; }
-                        if(d.type === 'chat') addChatMessage(d.name, d.msg);
-                    });
-                    conn.on('close', () => location.reload());
-                }
-            });
+function animate() {
+    requestAnimationFrame(animate);
+    update();
+    renderer.render(scene, camera);
+}
+animate();
 
-            peer.on('error', (err) => {
-                document.getElementById('loading-overlay').style.display = 'none';
-                showError("CONNECTION FAILED!");
-                console.error(err);
-            });
-
-            if(host) {
-                peer.on('connection', (c) => {
-                    activeConnections.push(c);
-                    c.on('data', (d) => {
-                        if(d.type === 'join') players[c.peer] = { x: 2500, y: 2500, isIt: false, name: d.name, skin: d.skin, protection: 5 };
-                        if(d.type === 'move' && players[c.peer]) { players[c.peer].x = d.x; players[c.peer].y = d.y; }
-                        if(d.type === 'chat') {
-                            addChatMessage(d.name, d.msg);
-                            activeConnections.forEach(co => { if(co.peer !== c.peer) co.send({ type: 'chat', name: d.name, msg: d.msg }); });
-                        }
-                    });
-                    c.on('close', () => {
-                        delete players[c.peer];
-                        activeConnections = activeConnections.filter(con => con.peer !== c.peer);
-                    });
-                });
-            }
-        }
-
-        function startHost(m) { selectedMap = m; setupRoom(true); }
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        // Movement Logic
-        const joyBase = document.getElementById('joyBase');
-        const handleJoy = (e) => {
-            const touch = e.touches[0];
-            const rect = joyBase.getBoundingClientRect();
-            const dx = touch.clientX - (rect.left + rect.width/2);
-            const dy = touch.clientY - (rect.top + rect.height/2);
-            const dist = Math.min(40, Math.hypot(dx, dy));
-            const angle = Math.atan2(dy, dx);
-            joyPos.x = (Math.cos(angle) * dist) / 40;
-            joyPos.y = (Math.sin(angle) * dist) / 40;
-            document.getElementById('joyKnob').style.transform = `translate(${joyPos.x*30}px, ${joyPos.y*30}px)`;
-        };
-        joyBase.addEventListener('touchstart', (e) => { e.preventDefault(); isJoy = true; handleJoy(e); });
-        window.addEventListener('touchmove', (e) => { if(isJoy) handleJoy(e); });
-        window.addEventListener('touchend', (e) => { if(e.touches.length === 0) { isJoy = false; joyPos = {x:0, y:0}; document.getElementById('joyKnob').style.transform = 'translate(0,0)'; } });
-        document.getElementById('dashBtn').addEventListener('touchstart', (e) => { e.preventDefault(); isDashing = true; });
-        document.getElementById('dashBtn').addEventListener('touchend', () => { isDashing = false; });
-
-        function moveWithCollision(p, dx, dy) {
-            let nX = p.x + dx, nY = p.y + dy, rad = 45;
-            let okX = true, okY = true;
-            for(let ob of obstacles) {
-                if(nX+rad > ob.x && nX-rad < ob.x+ob.w && p.y+rad > ob.y && p.y-rad < ob.y+ob.h) okX = false;
-                if(p.x+rad > ob.x && p.x-rad < ob.x+ob.w && nY+rad > ob.y && nY-rad < ob.y+ob.h) okY = false;
-            }
-            if(okX) p.x = nX; if(okY) p.y = nY;
-            // Map boundaries
-            p.x = Math.max(0, Math.min(worldSize, p.x));
-            p.y = Math.max(0, Math.min(worldSize, p.y));
-        }
-
-        function drawPlayer(p, id) {
-            ctx.save();
-            ctx.translate(p.x, p.y);
-            if(p.isIt) {
-                ctx.shadowBlur = 40; ctx.shadowColor = 'red';
-                ctx.strokeStyle = 'red'; ctx.lineWidth = 10;
-                ctx.strokeRect(-55,-55,110,110);
-            }
-
-            let bodyCol = p.skin === "black" ? "#0f172a" : p.skin === "gumball" ? "#7dd3fc" : p.skin === "darwin" ? "#f97316" : "#22c55e";
-            ctx.fillStyle = "#0f172a"; 
-            ctx.beginPath(); ctx.roundRect(-55,-55,110,110,25); ctx.fill();
-            ctx.fillStyle = bodyCol;
-            ctx.beginPath(); ctx.roundRect(-45,-45,90,90,20); ctx.fill();
-
-            // Eyes
-            const eX = (id === myId ? joyPos.x : 0) * 6, eY = (id === myId ? joyPos.y : 0) * 6;
-            ctx.fillStyle = 'white';
-            ctx.beginPath(); ctx.roundRect(-24, -20, 18, 18, 5); ctx.fill();
-            ctx.beginPath(); ctx.roundRect(6, -20, 18, 18, 5); ctx.fill();
-            ctx.fillStyle = '#0f172a';
-            ctx.beginPath(); ctx.roundRect(-18+eX, -14+eY, 8, 8, 2); ctx.fill();
-            ctx.beginPath(); ctx.roundRect(12+eX, -14+eY, 8, 8, 2); ctx.fill();
-
-            ctx.fillStyle = 'white'; ctx.font = "900 35px Outfit"; ctx.textAlign = "center";
-            ctx.fillText(p.name, 0, -100);
-            if(p.protection > 0) {
-                ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 5;
-                ctx.beginPath(); ctx.arc(0,0, 80, 0, Math.PI*2); ctx.stroke();
-            }
-            ctx.restore();
-        }
-
-        function gameLoop() {
-            const curMap = maps[selectedMap];
-            const me = players[myId];
-            
-            if(me) {
-                // Dash & Stamina logic
-                let actualDash = false;
-                if(isDashing && stamina > 0) {
-                    actualDash = true; stamina -= 1.5;
-                } else if(stamina < 100) {
-                    stamina += 0.5;
-                }
-                document.getElementById('staminaFill').style.width = stamina + "%";
-
-                const speed = actualDash ? 22 : 11;
-                moveWithCollision(me, joyPos.x * speed, joyPos.y * speed);
-                cam.x += (me.x - cam.x) * 0.1; cam.y += (me.y - cam.y) * 0.1;
-
-                if(isHost) {
-                    matchTimer = Math.max(0, matchTimer - 0.016);
-                    
-                    // Safety check for IT player
-                    let itId = Object.keys(players).find(k => players[k].isIt);
-                    if(!itId && Object.keys(players).length > 0) {
-                        players[Object.keys(players)[0]].isIt = true;
-                        itId = Object.keys(players)[0];
-                    }
-
-                    if(itId) {
-                        for(let id in players) {
-                            if(id !== itId) {
-                                if(players[id].protection > 0) players[id].protection = Math.max(0, players[id].protection - 0.016);
-                                let dist = Math.hypot(players[id].x-players[itId].x, players[id].y-players[itId].y);
-                                if(dist < 90 && players[id].protection <= 0 && players[itId].protection <= 0) {
-                                    players[itId].isIt = false; players[itId].protection = 3;
-                                    players[id].isIt = true; players[id].protection = 3;
-                                }
-                            } else if(players[itId].protection > 0) {
-                                players[itId].protection = Math.max(0, players[itId].protection - 0.016);
-                            }
-                        }
-                    }
-
-                    // Throttle network state to 20fps instead of 60fps to save bandwidth
-                    networkTick++;
-                    if(networkTick % 3 === 0) {
-                        activeConnections.forEach(c => c.send({type:'state', players, obstacles, map: selectedMap, timer: matchTimer}));
-                    }
-                } else if(conn?.open) {
-                    conn.send({ type: 'move', x: me.x, y: me.y });
-                }
-            }
-
-            ctx.fillStyle = curMap.bg; ctx.fillRect(0,0,canvas.width, canvas.height);
-            ctx.save(); ctx.translate(canvas.width/2, canvas.height/2); ctx.scale(0.5, 0.5); ctx.translate(-cam.x, -cam.y);
-            ctx.fillStyle = curMap.floor; ctx.fillRect(0,0,worldSize,worldSize);
-            obstacles.forEach(ob => { ctx.fillStyle = curMap.wall; ctx.beginPath(); ctx.roundRect(ob.x, ob.y, ob.w, ob.h, 15); ctx.fill(); });
-            for(let id in players) drawPlayer(players[id], id);
-            ctx.restore();
-
-            const min = Math.floor(matchTimer/60), sec = Math.floor(matchTimer%60);
-            document.getElementById('timerBox').innerText = `${min}:${sec.toString().padStart(2, '0')}`;
-            requestAnimationFrame(gameLoop);
-        }
-    </script>
+window.onresize = () => {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+};
+</script>
 </body>
 </html>
 
+```
+    
