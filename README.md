@@ -1,2 +1,2 @@
-# Tag-attack
-Tag and attack your friends 
+# APEX POINT
+TRY TO GET THE HIGHEST SCORE
