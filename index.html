@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,179 +6,154 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>APEX POINT | High Speed Dubai</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&display=swap');
 
   * { margin: 0; padding: 0; box-sizing: border-box; touch-action: none; }
 
   body {
     background: #87ceeb;
     overflow: hidden;
-    font-family: 'Orbitron', sans-serif;
+    font-family: 'Rajdhani', sans-serif;
     color: #fff;
     user-select: none;
   }
 
   #canvas { display: block; width: 100vw; height: 100vh; }
 
+  /* UI Styling based on Screenshots */
   #hud {
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
     pointer-events: none;
     z-index: 10;
+    padding: 30px;
   }
 
+  /* Points Pill (Center Top) */
+  #points-card {
+    position: absolute;
+    top: 25px; left: 50%;
+    transform: translateX(-50%);
+    background: rgba(40, 40, 40, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 18px;
+    padding: 8px 35px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  #points-label { font-size: 10px; letter-spacing: 2px; color: #00ff88; font-weight: 700; margin-bottom: -4px; }
+  #score-val { font-family: 'Orbitron'; font-size: 38px; font-weight: 900; }
+
+  /* Hull Card (Top Left) */
+  #hull-card {
+    position: absolute;
+    top: 25px; left: 25px;
+    background: rgba(40, 40, 40, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .card-label { font-size: 9px; letter-spacing: 1.5px; opacity: 0.7; margin-bottom: 4px; font-weight: 700; }
+  #durability { font-size: 22px; color: #ff4444; letter-spacing: 4px; }
+
+  /* Nitro Card (Bottom Left) */
+  #nitro-card {
+    position: absolute;
+    bottom: 250px; left: 25px;
+    background: rgba(20, 20, 20, 0.6);
+    backdrop-filter: blur(10px);
+    padding: 15px;
+    border-radius: 15px;
+    width: 220px;
+  }
+  #nitro-bar-container {
+    width: 100%; height: 10px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  #nitro-fill {
+    height: 100%; width: 100%;
+    background: linear-gradient(90deg, #00f2fe, #4facfe);
+    box-shadow: 0 0 15px #00f2fe;
+  }
+
+  /* Speedometer (Bottom Right) */
+  #speed-card {
+    position: absolute;
+    bottom: 240px; right: 25px;
+    background: rgba(20, 20, 20, 0.7);
+    backdrop-filter: blur(10px);
+    padding: 15px 30px;
+    border-radius: 15px;
+    text-align: right;
+  }
+  #speed-val { font-family: 'Orbitron'; font-size: 72px; font-weight: 900; font-style: italic; line-height: 0.9; }
+  .speed-unit { font-size: 14px; color: #00ff88; font-weight: 900; margin-top: 5px; }
+
+  /* Map (Top Right) */
   #mini-map {
     position: absolute;
-    top: 20px; right: 20px;
-    width: 70px; height: 160px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(255,255,255,0.8);
-    border-radius: 8px;
-    backdrop-filter: blur(5px);
+    top: 25px; right: 25px;
+    width: 70px; height: 180px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(255,255,255,0.2);
+    border-radius: 10px;
     overflow: hidden;
   }
   #map-player {
     position: absolute;
-    width: 6px; height: 10px;
+    width: 8px; height: 12px;
     background: #00ff88;
     left: 50%; bottom: 15px;
     transform: translateX(-50%);
-    box-shadow: 0 0 8px #00ff88;
-    z-index: 2;
+    box-shadow: 0 0 10px #00ff88;
+    z-index: 5;
   }
 
-  #stats-panel {
-    position: absolute;
-    top: 20px; left: 20px;
-    background: rgba(0,0,0,0.5);
-    padding: 10px;
-    border-radius: 8px;
-  }
-
-  #score-panel {
-    position: absolute;
-    top: 20px; left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    background: rgba(0,0,0,0.4);
-    padding: 5px 20px;
-    border-radius: 20px;
-  }
-  #score-val { font-size: 32px; font-weight: 700; }
-
-  /* FIX: MOVED SPEEDOMETER HIGHER TO CLEAR TOUCH BUTTONS */
-  #speedometer-stack {
-    position: absolute;
-    bottom: 230px; 
-    left: 20px;
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: rgba(0,0,0,0.4);
-    padding: 12px;
-    border-radius: 12px;
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.1);
-  }
-
-  #speed-display { display: flex; align-items: baseline; gap: 5px; }
-  #speed-val { font-size: 48px; font-weight: 900; color: #fff; line-height: 1; }
-  .kmh-unit { font-size: 12px; color: #00ff88; font-weight: 800; }
-
-  #nitro-track {
-    width: 160px; height: 8px;
-    background: rgba(255,255,255,0.1);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  #nitro-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #00f2fe, #4facfe);
-    width: 100%;
-    box-shadow: 0 0 10px #00f2fe;
-    transition: width 0.1s linear;
-  }
-
+  /* Menu Screens */
   .screen {
     position: fixed; inset: 0;
     display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 20; background: linear-gradient(to bottom, #87ceeb 0%, #e0f6ff 100%);
+    z-index: 100; background: #0a0a0a;
   }
   .hidden { display: none !important; }
 
   .game-title {
-    font-size: clamp(36px, 8vw, 64px);
-    font-weight: 900; letter-spacing: 4px; color: #111;
-    margin-bottom: 20px; text-shadow: 2px 2px 0px #00ff88;
+    font-family: 'Orbitron'; font-size: 72px; font-weight: 900;
+    background: linear-gradient(#fff, #888); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 40px;
   }
-
-  #credits-bar {
-    background: rgba(0,0,0,0.85);
-    color: #00ff88;
-    padding: 10px 25px;
-    border-radius: 30px;
-    font-size: 10px;
-    letter-spacing: 1.5px;
-    margin-bottom: 30px;
-    border: 1px solid rgba(0,255,136,0.3);
-    text-align: center;
-  }
-
-  .car-selection {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 30px;
-  }
-  .car-opt {
-    width: 80px; height: 45px;
-    border: 2px solid #111;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: 0.2s;
-    background: #fff;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: bold; font-size: 12px; color: #000;
-  }
-  .car-opt.active { border-color: #00ff88; background: #00ff88; }
 
   .btn {
     pointer-events: all; cursor: pointer;
-    background: #111; color: #fff;
-    font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700;
-    padding: 15px; border: none; border-radius: 8px;
-    width: 250px; margin-bottom: 12px; transition: 0.2s;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .btn:active { transform: scale(0.95); }
-  .btn.outline { background: transparent; border: 2px solid #111; color: #111; }
-
-  #damage-flash {
-    position: fixed; inset: 0;
-    background: red; opacity: 0;
-    pointer-events: none; z-index: 100;
+    background: #00ff88; color: #000;
+    font-family: 'Orbitron', sans-serif; font-size: 18px; font-weight: 900;
+    padding: 20px 60px; border: none; border-radius: 50px;
+    margin-bottom: 15px; transition: 0.2s;
   }
 
-  /* FIX: LOWER HEIGHT AND BETTER SPACING FOR MOBILE CONTROLS */
+  /* Touch Controls (Screenshot Style) */
   #touch-controls {
-    position: fixed; bottom: 15px; left: 0; right: 0;
-    height: 150px; pointer-events: none; z-index: 15;
+    position: fixed; bottom: 40px; left: 0; right: 0;
+    height: 180px; pointer-events: none; z-index: 20;
+    padding: 0 40px;
   }
   .t-btn {
-    pointer-events: all; background: rgba(0,0,0,0.3);
-    border: 2px solid rgba(255,255,255,0.4); border-radius: 20px;
+    pointer-events: all; background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
     display: flex; align-items: center; justify-content: center; color: white;
-    backdrop-filter: blur(5px);
+    backdrop-filter: blur(10px);
   }
-  .t-btn.active { background: rgba(0,255,136,0.6); }
+  .circle { width: 100px; height: 100px; border-radius: 50%; font-size: 32px; }
+  .pedal { width: 110px; height: 160px; border-radius: 15px; font-weight: 900; font-size: 16px; }
   
-  #t-steer { position: absolute; left: 20px; bottom: 0; display: flex; gap: 10px; }
-  #t-actions { position: absolute; right: 20px; bottom: 0; display: flex; gap: 10px; flex-direction: column; }
-  .circle { width: 75px; height: 75px; font-size: 24px; border-radius: 50%; }
-  .pedal { width: 85px; height: 110px; font-size: 13px; font-weight: bold; }
+  #steer-zone { position: absolute; left: 40px; bottom: 0; display: flex; gap: 20px; }
+  #action-zone { position: absolute; right: 40px; bottom: 0; display: flex; align-items: flex-end; gap: 15px; }
 
-  @media (min-width: 769px) { #touch-controls { display: none; } }
+  #damage-flash { position: fixed; inset: 0; background: red; opacity: 0; pointer-events: none; z-index: 1000; }
 </style>
 </head>
 <body>
@@ -186,66 +162,51 @@
 <div id="damage-flash"></div>
 
 <div id="hud" class="hidden">
-  <div id="stats-panel">
-    <div style="font-size:9px; color:#00ff88; margin-bottom:2px">HULL</div>
+  <div id="hull-card">
+    <div class="card-label">CHASSIS</div>
     <div id="durability">♥♥♥</div>
   </div>
-  
-  <div id="mini-map"><div id="map-player"></div></div>
-  
-  <div id="score-panel">
+
+  <div id="points-card">
+    <div id="points-label">POINTS</div>
     <div id="score-val">0</div>
   </div>
-  
-  <div id="speedometer-stack">
-    <div id="speed-display">
-      <div id="speed-val">0</div>
-      <div class="kmh-unit">KM/H</div>
-    </div>
-    <div id="nitro-track"><div id="nitro-fill"></div></div>
-    <div style="font-size:8px; letter-spacing: 1px; opacity:0.8">NITRO CHARGE</div>
+
+  <div id="mini-map"><div id="map-player"></div></div>
+
+  <div id="nitro-card">
+    <div class="card-label">NITRO</div>
+    <div id="nitro-bar-container"><div id="nitro-fill"></div></div>
+  </div>
+
+  <div id="speed-card">
+    <div id="speed-val">0</div>
+    <div class="speed-unit">KM/H</div>
   </div>
 </div>
 
 <div class="screen" id="start-screen">
   <div class="game-title">APEX POINT</div>
-  
-  <div id="credits-bar">
-    THANKS: BASIL • ASHMITH • EDWIN • DEV
-  </div>
-
-  <div style="color:#111; margin-bottom:10px; font-size:12px; font-weight:bold; letter-spacing:1px">SELECT VEHICLE</div>
-  <div class="car-selection">
-    <div class="car-opt active" onclick="selectCar(0, this)">GREY</div>
-    <div class="car-opt" onclick="selectCar(1, this)" style="color:#ff4444">RED</div>
-    <div class="car-opt" onclick="selectCar(2, this)" style="color:#4facfe">BLUE</div>
-  </div>
-
-  <button class="btn" onclick="startGame()">START DRIVE</button>
-  <div style="color: #444; font-size: 10px; letter-spacing: 2px; font-weight: bold; margin-top: 20px;">DUMB BRAINEZ PRODUCTIONS</div>
+  <button class="btn" onclick="startGame()">START RUN</button>
+  <p style="font-size:12px; letter-spacing:4px; opacity:0.5">DUMB BRAINEZ PRODUCTIONS</p>
 </div>
 
 <div class="screen hidden" id="gameover-screen">
-  <div class="game-title" style="color:#ff4444">TOTALED</div>
-  <div style="text-align: center; margin-bottom: 25px;">
-    <p style="color:#111; font-size:14px; font-weight:bold; opacity:0.6">DISTANCE SCORE</p>
-    <h1 id="final-score" style="font-size: 72px; color: #111;">0</h1>
-  </div>
-  
-  <button class="btn" onclick="startGame()">RETRY RUN</button>
-  <button class="btn outline" onclick="goHome()">HOME MENU</button>
+  <div class="game-title" style="color:#ff4444">CRASHED</div>
+  <h2 id="final-score" style="font-size: 80px; margin-bottom: 30px;">0</h2>
+  <button class="btn" onclick="startGame()">RETRY</button>
 </div>
 
 <div id="touch-controls">
-  <div id="t-steer">
+  <div id="steer-zone">
     <div class="t-btn circle" id="btn-left">◀</div>
     <div class="t-btn circle" id="btn-right">▶</div>
   </div>
-  <div id="t-actions">
-    <div class="t-btn" id="btn-nitro" style="height:40px; border-radius:20px; font-size:10px; font-weight:bold;">NITRO</div>
-    <div style="display:flex; gap:10px">
-        <div class="t-btn pedal" id="btn-brake">BRAKE</div>
-        <div class="t-btn pedal" id="btn-accel" style="border-color:#00ff88">GAS</div>
+  <div id="action-zone">
+    <div class="t-btn pedal" id="btn-brake" style="height:120px">BRAKE</div>
+    <div style="display:flex; flex-direction:column; gap:15px">
+        <div class="t-btn" id="btn-nitro" style="height:45px; width:110px; border-radius:20px; font-size:12px; font-weight:900">NITRO</div>
+        <div class="t-btn pedal" id="btn-accel" style="border-color:#00ff88; color:#00ff88">GAS</div>
     </div>
   </div>
 </div>
@@ -253,125 +214,68 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 let gameState = 'START';
-let score = 0;
-let speed = 0;
-let nitro = 100;
-let playerX = 0;
-let lives = 3;
-let selectedCarColor = 0x888888;
+let score = 0, speed = 0, nitro = 100, playerX = 0, lives = 3;
 const traffic = [];
 const keys = {};
 
-const MAX_SPD_BASE = 2.5; 
-const MAX_SPD_NITRO = 3.2;
-const TRAFFIC_SPD = 1.0;
-const SCORE_RATE = 0.05;
-
 const scene = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(65, window.innerWidth/window.innerHeight, 0.1, 2000);
+const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 2000);
 const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('canvas'), antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(window.devicePixelRatio);
 
-const ambient = new THREE.AmbientLight(0xffffff, 0.85);
-const sun = new THREE.DirectionalLight(0xfff5e1, 1.7);
-sun.position.set(100, 200, -100);
-scene.add(ambient, sun);
+// Lighting for "Screenshot" Look
+scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+sun.position.set(50, 100, 50);
+scene.add(sun);
 
-function createDetailedCar(color, isPlayer = false) {
-    const car = new THREE.Group();
-    const bodyMat = new THREE.MeshStandardMaterial({color: color, metalness: 0.8, roughness: 0.2});
-    const glassMat = new THREE.MeshStandardMaterial({color: 0x111111, metalness: 1, roughness: 0.1, transparent: true, opacity: 0.9});
-    const lightMat = new THREE.MeshBasicMaterial({color: 0xffffff}); 
-    const tailMat = new THREE.MeshBasicMaterial({color: 0xff0000}); 
-    const blackMat = new THREE.MeshStandardMaterial({color: 0x111111});
+function createCar(color) {
+    const group = new THREE.Group();
+    const body = new THREE.Mesh(new THREE.BoxGeometry(2.2, 0.8, 4.8), new THREE.MeshStandardMaterial({color: color, metalness: 0.7, roughness: 0.2}));
+    body.position.y = 0.5;
+    group.add(body);
 
-    const body = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.6, 5.0), bodyMat);
-    body.position.y = 0.45;
-    car.add(body);
+    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.6, 2.0), new THREE.MeshStandardMaterial({color: 0x111111}));
+    cabin.position.set(0, 1.1, 0.3);
+    group.add(cabin);
 
-    const cabin = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.5, 2.2), glassMat);
-    cabin.position.set(0, 0.9, 0.4);
-    car.add(cabin);
-    
-    const roof = new THREE.Mesh(new THREE.BoxGeometry(1.7, 0.1, 1.8), bodyMat);
-    roof.position.set(0, 1.15, 0.4);
-    car.add(roof);
-
-    const wing = new THREE.Mesh(new THREE.BoxGeometry(2.3, 0.05, 0.6), bodyMat);
-    wing.position.set(0, 1.1, 2.3);
-    car.add(wing);
-
-    const lightL = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.15, 0.1), lightMat);
-    lightL.position.set(-0.8, 0.55, -2.46);
-    car.add(lightL);
-    const lightR = lightL.clone(); lightR.position.x = 0.8; car.add(lightR);
-
-    const wheelGeo = new THREE.CylinderGeometry(0.4, 0.4, 0.4, 16);
-    wheelGeo.rotateZ(Math.PI/2);
-    const wheelMat = new THREE.MeshStandardMaterial({color: 0x222222});
-    const wPos = [[-1, 0.4, 1.6], [1, 0.4, 1.6], [-1, 0.4, -1.6], [1, 0.4, -1.6]];
-    wPos.forEach(p => {
-        const w = new THREE.Mesh(wheelGeo, wheelMat);
-        w.position.set(...p);
-        car.add(w);
+    // Wheels
+    const wGeo = new THREE.CylinderGeometry(0.45, 0.45, 0.4, 16);
+    wGeo.rotateZ(Math.PI/2);
+    const wMat = new THREE.MeshStandardMaterial({color: 0x111111});
+    [[-1,0.4,1.5],[1,0.4,1.5],[-1,0.4,-1.5],[1,0.4,-1.5]].forEach(p => {
+        const w = new THREE.Mesh(wGeo, wMat); w.position.set(...p); group.add(w);
     });
 
-    return car;
-}
-
-function selectCar(index, el) {
-    const colors = [0x888888, 0xff4444, 0x4facfe];
-    selectedCarColor = colors[index];
-    document.querySelectorAll('.car-opt').forEach(opt => opt.classList.remove('active'));
-    el.classList.add('active');
-    scene.remove(player);
-    player = createDetailedCar(selectedCarColor, true);
-    scene.add(player);
-}
-
-let player = createDetailedCar(selectedCarColor, true);
-scene.add(player);
-
-function createBuilding() {
-    const h = 50 + Math.random() * 120;
-    const b = new THREE.Mesh(new THREE.BoxGeometry(22, h, 22), 
-        new THREE.MeshStandardMaterial({
-            color: [0xcccccc, 0xaaaaaa, 0xeeeeee, 0x333333][Math.floor(Math.random()*4)],
-            metalness: 0.5, roughness: 0.2
-        })
-    );
-    b.position.y = h/2;
-    return b;
-}
-
-const segments = [];
-const SEG_SIZE = 100;
-const SEG_COUNT = 15;
-
-function createSegment(z) {
-    const group = new THREE.Group();
-    const ground = new THREE.Mesh(new THREE.PlaneGeometry(1500, SEG_SIZE), new THREE.MeshStandardMaterial({color: 0x388e3c}));
-    ground.rotation.x = -Math.PI/2;
-    const road = new THREE.Mesh(new THREE.PlaneGeometry(24, SEG_SIZE), new THREE.MeshStandardMaterial({color: 0x181818}));
-    road.rotation.x = -Math.PI/2; road.position.y = 0.05;
-    group.add(ground, road);
-
-    for(let i=0; i<10; i++) {
-        let x = (45 + Math.random()*180) * (Math.random() > 0.5 ? 1 : -1);
-        let posZ = (Math.random() - 0.5) * SEG_SIZE;
-        const b = createBuilding(); b.position.set(x, 0, posZ); group.add(b);
-    }
-    group.position.z = z;
-    scene.add(group);
     return group;
 }
 
-function goHome() {
-    gameState = 'START';
-    document.getElementById('gameover-screen').classList.add('hidden');
-    document.getElementById('start-screen').classList.remove('hidden');
-    document.getElementById('hud').classList.add('hidden');
+let player = createCar(0x0066ff);
+scene.add(player);
+
+const segments = [];
+function createSegment(z) {
+    const group = new THREE.Group();
+    const road = new THREE.Mesh(new THREE.PlaneGeometry(28, 100), new THREE.MeshStandardMaterial({color: 0x222222}));
+    road.rotation.x = -Math.PI/2;
+    group.add(road);
+
+    const grass = new THREE.Mesh(new THREE.PlaneGeometry(1000, 100), new THREE.MeshStandardMaterial({color: 0x55ff55}));
+    grass.rotation.x = -Math.PI/2; grass.position.y = -0.1;
+    group.add(grass);
+
+    // Buildings
+    for(let i=0; i<6; i++) {
+        const h = 40 + Math.random()*80;
+        const b = new THREE.Mesh(new THREE.BoxGeometry(20, h, 20), new THREE.MeshStandardMaterial({color: 0x777777}));
+        b.position.set(i % 2 === 0 ? -40 - Math.random()*20 : 40 + Math.random()*20, h/2, (Math.random()-0.5)*100);
+        group.add(b);
+    }
+
+    group.position.z = z;
+    scene.add(group);
+    return group;
 }
 
 function startGame() {
@@ -381,12 +285,11 @@ function startGame() {
     traffic.length = 0;
     segments.forEach(s => scene.remove(s));
     segments.length = 0;
+    for(let i=0; i<15; i++) segments.push(createSegment(-i * 100));
+    
     document.getElementById('start-screen').classList.add('hidden');
     document.getElementById('gameover-screen').classList.add('hidden');
     document.getElementById('hud').classList.remove('hidden');
-    scene.background = new THREE.Color(0x87ceeb);
-    scene.fog = new THREE.Fog(0x87ceeb, 200, 1400);
-    for(let i=0; i<SEG_COUNT; i++) segments.push(createSegment(-i * SEG_SIZE));
     updateHUD();
 }
 
@@ -398,55 +301,53 @@ function spawnTraffic() {
     if (gameState !== 'PLAY') return;
     const lanes = [-9, -3, 3, 9];
     const lane = lanes[Math.floor(Math.random() * lanes.length)];
-    const tColor = [0xffffff, 0xffcc00, 0x555555][Math.floor(Math.random()*3)];
-    const car = createDetailedCar(tColor);
-    car.position.set(lane, 0.0, -800);
-    car.speed = TRAFFIC_SPD;
+    const t = createCar(0x333333);
+    t.position.set(lane, 0, -800);
+    
     const dot = document.createElement('div');
-    dot.style.cssText = "position:absolute; width:5px; height:5px; background:#ff4444; border-radius:50%; left:50%; transform:translateX(-50%);";
+    dot.style.cssText = "position:absolute; width:6px; height:6px; background:#ff4444; border-radius:50%; left:50%; transform:translateX(-50%);";
     document.getElementById('mini-map').appendChild(dot);
-    car.dot = dot;
-    scene.add(car);
-    traffic.push(car);
+    t.dot = dot;
+    
+    scene.add(t);
+    traffic.push(t);
 }
-setInterval(spawnTraffic, 600);
+setInterval(spawnTraffic, 500);
 
 function update() {
     if (gameState !== 'PLAY') return;
 
-    if (keys['ArrowLeft'] || keys['KeyA'] || keys['left']) playerX -= 0.38;
-    if (keys['ArrowRight'] || keys['KeyD'] || keys['right']) playerX += 0.38;
+    if (keys['left']) playerX -= 0.4;
+    if (keys['right']) playerX += 0.4;
     playerX = Math.max(-11, Math.min(11, playerX));
-    player.position.x += (playerX - player.position.x) * 0.16;
-    player.rotation.z = (playerX - player.position.x) * -0.12;
+    player.position.x += (playerX - player.position.x) * 0.2;
+    player.rotation.z = (playerX - player.position.x) * -0.15;
 
-    const isNitro = (keys['ShiftLeft'] || keys['nitro']) && nitro > 1;
-    let target = keys['ArrowUp'] || keys['accel'] ? MAX_SPD_BASE : 0.8;
-    if (keys['ArrowDown'] || keys['brake']) target = 0.2;
-    if (isNitro) { target = MAX_SPD_NITRO; nitro -= 0.65; } 
-    else if(nitro < 100) { nitro += 0.15; }
+    const isNitro = keys['nitro'] && nitro > 1;
+    let target = keys['accel'] ? 2.8 : 0.8;
+    if (keys['brake']) target = 0.2;
+    if (isNitro) { target = 3.6; nitro -= 0.7; } else if (nitro < 100) nitro += 0.2;
     
-    speed += (target - speed) * 0.045;
-    score += speed * SCORE_RATE; 
+    speed += (target - speed) * 0.05;
+    score += speed * 0.1;
 
     segments.forEach(seg => {
         seg.position.z += speed;
-        if(seg.position.z > SEG_SIZE) seg.position.z -= SEG_COUNT * SEG_SIZE;
+        if(seg.position.z > 100) seg.position.z -= 1500;
     });
 
     for(let i=traffic.length-1; i>=0; i--) {
         const t = traffic[i];
-        t.position.z += speed - t.speed;
-        const relativeZ = Math.abs(t.position.z);
-        t.dot.style.bottom = (160 - (relativeZ * 0.4)) + 'px';
+        t.position.z += speed - 1.0;
+        t.dot.style.bottom = (180 - (Math.abs(t.position.z) * 0.22)) + 'px';
         t.dot.style.left = `calc(50% + ${t.position.x * 2.5}px)`;
 
-        if (Math.abs(t.position.x - player.position.x) < 2.1 && Math.abs(t.position.z - player.position.z) < 4.6) {
+        if (Math.abs(t.position.x - player.position.x) < 2.2 && Math.abs(t.position.z - player.position.z) < 4.5) {
             document.getElementById('damage-flash').style.opacity = '0.5';
             setTimeout(() => document.getElementById('damage-flash').style.opacity = '0', 100);
             lives--; updateHUD();
             t.dot.remove(); scene.remove(t); traffic.splice(i, 1);
-            speed *= 0.1;
+            speed *= 0.2;
             if (lives <= 0) {
                 gameState = 'GAMEOVER';
                 document.getElementById('gameover-screen').classList.remove('hidden');
@@ -457,22 +358,20 @@ function update() {
         if(t.position.z > 50) { t.dot.remove(); scene.remove(t); traffic.splice(i, 1); }
     }
 
-    camera.position.set(player.position.x * 0.2, 5.4 + (speed * 0.2), 14 + (speed * 1.6));
-    camera.lookAt(player.position.x, 1.4, -120);
+    camera.position.set(player.position.x * 0.3, 5 + (speed * 0.1), 12 + (speed * 1.5));
+    camera.lookAt(player.position.x, 1, -100);
 
-    document.getElementById('speed-val').innerText = Math.floor(speed * 100);
+    document.getElementById('speed-val').innerText = Math.floor(speed * 105);
     document.getElementById('score-val').innerText = Math.floor(score);
     document.getElementById('nitro-fill').style.width = nitro + '%';
     document.getElementById('map-player').style.left = `calc(50% + ${player.position.x * 2.5}px)`;
 }
 
-window.onkeydown = e => keys[e.code] = true;
-window.onkeyup = e => keys[e.code] = false;
-
+// Touch Handling
 const bind = (id, k) => {
     const el = document.getElementById(id);
-    el.ontouchstart = e => { e.preventDefault(); keys[k] = true; el.classList.add('active'); };
-    el.ontouchend = e => { e.preventDefault(); keys[k] = false; el.classList.remove('active'); };
+    el.ontouchstart = e => { e.preventDefault(); keys[k] = true; };
+    el.ontouchend = e => { e.preventDefault(); keys[k] = false; };
 };
 bind('btn-left', 'left'); bind('btn-right', 'right');
 bind('btn-accel', 'accel'); bind('btn-brake', 'brake');
@@ -493,3 +392,5 @@ window.onresize = () => {
 </script>
 </body>
 </html>
+
+```
